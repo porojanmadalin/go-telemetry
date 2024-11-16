@@ -1,7 +1,6 @@
 package config
 
 import (
-	"go-telemetry/pkg/logging"
 	"log"
 	"os"
 	"sync"
@@ -10,43 +9,44 @@ import (
 )
 
 const (
-	ConfigFileNameEnvKey  = "GO_TELEMETRY_FILE_NAME"
-	DefaultConfigFileName = "telemetry-config.yml"
+	configFileNameEnvKey  = "GO_TELEMETRY_FILE_NAME"
+	defaultConfigFileName = "telemetry-config.yml"
 )
 
-type Config struct {
-	Logging struct {
-		Level logging.LoggingLevel `yaml:"level"`
-	} `yaml:"logging"`
+type config struct {
+	Logger struct {
+		Level        string `yaml:"level"`
+		OutputWriter string `yaml:"outputWriter"`
+	} `yaml:"logger"`
 }
 
 var configOnce sync.Once
-var LoggingConfig Config
+var LoggerConfig config
 
-func Init() Config {
+func Init() config {
 	configOnce.Do(func() {
-		LoggingConfig = loadConfig()
+		LoggerConfig = loadConfig()
 	})
-	return LoggingConfig
+	return LoggerConfig
 }
 
-func loadConfig() Config {
-	configFileName := os.Getenv(ConfigFileNameEnvKey)
+func loadConfig() config {
+	configFileName := os.Getenv(configFileNameEnvKey)
 	if configFileName == "" {
-		configFileName = DefaultConfigFileName
+		configFileName = defaultConfigFileName
 	}
 
 	f, err := os.Open(configFileName)
 	if err != nil {
-		log.Fatal("error: the logging config file could not be opened. Check if the file exists or if it is corrupt", err)
+		log.Fatal("error: the logger config file could not be opened. Check if the file exists or if it is corrupt", err)
 	}
 	defer f.Close()
 
-	var cfg Config
+	var cfg config
 	decoder := yaml.NewDecoder(f)
 	err = decoder.Decode(&cfg)
 	if err != nil {
-		log.Fatal("error: the logging config could not be decoded. Check if the file exists or if it is corrupt", err)
+		log.Fatal("error: the logger config could not be decoded. Check if the file exists or if it is corrupt", err)
 	}
 	return cfg
 }
