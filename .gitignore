@@ -26,3 +26,7 @@ go.work.sum
 
 # documents
 .pdf
+
+# config and env
+.env
+telemetry-config.yml

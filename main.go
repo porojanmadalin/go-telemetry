@@ -1,7 +1,12 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"go-telemetry/config"
+)
 
 func main() {
-	fmt.Println("Hello world")
+	config.Init()
+
+	fmt.Println(config.LoggingConfig.Logging.Level)
 }
