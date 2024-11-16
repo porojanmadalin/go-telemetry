@@ -12,10 +12,6 @@ const (
 	textFile OutputWriterType = "textFile"
 )
 
-const (
-	logFileExtension = ".log"
-)
-
 type OutputWriterType string
 
 type OutputWriter func(*LoggerData) error
