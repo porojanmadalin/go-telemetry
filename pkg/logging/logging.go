@@ -2,70 +2,50 @@ package logging
 
 import (
 	"fmt"
-	"go-telemetry/config"
 	"sync"
 	"time"
 )
 
-const (
-	// Logger levels
-	LevelOff     LoggerLevel = "off"     // 0
-	LevelInfo    LoggerLevel = "info"    // 1
-	LevelWarning LoggerLevel = "warning" // 2
-	LevelError   LoggerLevel = "error"   // 3
-	LevelDebug   LoggerLevel = "debug"   // 4
-)
-
-const (
-	// Logger levels
-	LevelOffInt     int = 0
-	LevelInfoInt    int = 1
-	LevelWarningInt int = 2
-	LevelErrorInt   int = 3
-	LevelDebugInt   int = 4
-)
-
-type LoggerLevel string
-
 type MetaData = map[string]any
 
 type LoggerData struct {
-	LoggerLevel LoggerLevel `json:"loggerLevel"`
+	LoggerLevel loggerLevel `json:"loggerLevel"`
 	Timestamp   time.Time   `json:"timestamp"`
 	Message     string      `json:"message"`
 	MetaData    MetaData    `json:"metaData"`
 }
 
-type Log struct {
-	loggerLevel LoggerLevel
-	outputWrite OutputWriter
+type logging struct {
+	loggerLevel loggerLevel
+	outputWrite LogOutputWriter
 }
 
 var loggerOnce sync.Once
-var loggerInstance *Log
+var loggerInstance *logging
+var writeLogOutputMutex sync.Mutex
 
-func New(options ...func(*Log)) *Log {
+func NewLog(options ...func(*logging)) *logging {
 	loggerOnce.Do(func() {
-		config.Init()
+		initConfig()
 
-		loggerInstance = &Log{}
+		loggerInstance = &logging{}
 
-		switch config.LoggerConfig.Logger.Level {
+		switch loggerConfig.Logger.Level {
 		case string(LevelOff), string(LevelInfo), string(LevelWarning), string(LevelError), string(LevelDebug):
-			loggerInstance.loggerLevel = LoggerLevel(config.LoggerConfig.Logger.Level)
+			loggerInstance.loggerLevel = loggerLevel(loggerConfig.Logger.Level)
 		default:
-			loggerInstance.loggerLevel = LevelInfo
+			loggerInstance.loggerLevel = LevelOff
 		}
 
-		switch config.LoggerConfig.Logger.OutputWriter {
+		switch loggerConfig.Logger.OutputWriter {
 		case string(cli):
-			loggerInstance.outputWrite = CLIOutputWrite()
+			loggerInstance.outputWrite = CLILogOutputWrite()
 		case string(jsonFile):
-			loggerInstance.outputWrite = JSONOutputFileWrite()
+			loggerInstance.outputWrite = JSONLogOutputFileWrite()
 		case string(textFile):
-			loggerInstance.outputWrite = TextOutputFileWrite()
+			loggerInstance.outputWrite = TextLogOutputFileWrite()
 		default:
-			loggerInstance.outputWrite = CLIOutputWrite()
+			loggerInstance.outputWrite = CLILogOutputWrite()
 		}
 
 		// Log options override the YAML file configuration
@@ -76,53 +56,37 @@ func New(options ...func(*Log)) *Log {
 	return loggerInstance
 }
 
-func WithLoggerLevel(loggerLevel LoggerLevel) func(*Log) {
-	return func(l *Log) {
+func WithLoggerLevel(loggerLevel loggerLevel) func(*logging) {
+	return func(l *logging) {
 		l.loggerLevel = loggerLevel
 	}
 }
 
-func WithOutputWriter(outputWriter OutputWriter) func(*Log) {
-	return func(l *Log) {
+func WithLogOutputWriter(outputWriter LogOutputWriter) func(*logging) {
+	return func(l *logging) {
 		l.outputWrite = outputWriter
 	}
 }
 
-func convertLoggerLevelToInt(loggerLevel LoggerLevel) int {
-	switch loggerLevel {
-	case LevelOff:
-		return 0
-	case LevelInfo:
-		return 1
-	case LevelWarning:
-		return 2
-	case LevelError:
-		return 3
-	case LevelDebug:
-		return 4
-	default:
-		return 1
-	}
-}
-
-func (l *Log) Info(msg string, v MetaData) {
+func (l *logging) Info(msg string, v MetaData) {
 	l.processLoggerData(LevelInfo, msg, v)
 }
 
-func (l *Log) Warning(msg string, v MetaData) {
+func (l *logging) Warning(msg string, v MetaData) {
 	l.processLoggerData(LevelWarning, msg, v)
 }
 
-func (l *Log) Error(msg string, v MetaData) {
+func (l *logging) Error(msg string, v MetaData) {
 	l.processLoggerData(LevelError, msg, v)
 }
 
-func (l *Log) Debug(msg string, v MetaData) {
+func (l *logging) Debug(msg string, v MetaData) {
 	l.processLoggerData(LevelDebug, msg, v)
 }
 
-func (l *Log) processLoggerData(loggerLevel LoggerLevel, msg string, metaData MetaData) {
+func (l *logging) processLoggerData(loggerLevel loggerLevel, msg string, metaData MetaData) {
 	if convertLoggerLevelToInt(loggerLevel) <= convertLoggerLevelToInt(l.loggerLevel) {
+		writeLogOutputMutex.Lock()
 		err := l.outputWrite(&LoggerData{
 			Timestamp:   time.Now(),
 			LoggerLevel: loggerLevel,
@@ -132,5 +96,6 @@ func (l *Log) processLoggerData(loggerLevel LoggerLevel, msg string, metaData Me
 		if err != nil {
 			fmt.Println(err)
 		}
+		writeLogOutputMutex.Unlock()
 	}
 }

@@ -10,12 +10,6 @@ import (
 )
 
 const (
-	cli      OutputWriterType = "cli"
-	jsonFile OutputWriterType = "jsonFile"
-	textFile OutputWriterType = "textFile"
-)
-
-const (
 	// JSON File Writer Constants
 	startArray      = "[\n"
 	endArray        = "\n]"
@@ -23,13 +17,11 @@ const (
 	objectDelimiter = ",\n" + indent
 )
 
-type OutputWriterType string
+type LogOutputWriter func(*LoggerData) error
 
-type OutputWriter func(*LoggerData) error
-
-func CLIOutputWrite() OutputWriter {
+func CLILogOutputWrite() LogOutputWriter {
 	return func(loggerData *LoggerData) error {
-		fmt.Printf("[%s] [%s] %s", loggerData.Timestamp.Format("2006-01-02 15:04:05"), loggerData.LoggerLevel, loggerData.Message)
+		fmt.Printf("[%s] [%s] %s", loggerData.Timestamp.Format("2006-01-02 15:04:05.0000"), loggerData.LoggerLevel, loggerData.Message)
 		for k, v := range loggerData.MetaData {
 			typeName := reflect.TypeOf(v).Name()
 			if strings.Contains(typeName, "int") {
@@ -48,7 +40,7 @@ func CLIOutputWrite() OutputWriter {
 	}
 }
 
-func JSONOutputFileWrite() OutputWriter {
+func JSONLogOutputFileWrite() LogOutputWriter {
 	return func(loggerData *LoggerData) error {
 		fileName := fmt.Sprintf("%s.json", loggerData.Timestamp.Format("2006-01-02"))
 		f, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE, 0644)
@@ -86,11 +78,12 @@ func JSONOutputFileWrite() OutputWriter {
 		if err != nil {
 			return fmt.Errorf("error: could not write json file %v", err)
 		}
+
 		return nil
 	}
 }
 
-func TextOutputFileWrite() OutputWriter {
+func TextLogOutputFileWrite() LogOutputWriter {
 	return func(loggerData *LoggerData) error {
 		fileName := fmt.Sprintf("%s.log", loggerData.Timestamp.Format("2006-01-02"))
 		f, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
@@ -99,7 +92,7 @@ func TextOutputFileWrite() OutputWriter {
 		}
 		defer f.Close()
 
-		f.WriteString(fmt.Sprintf("[%s] [%s] %s", loggerData.Timestamp.Format("2006-01-02 15:04:05"), loggerData.LoggerLevel, loggerData.Message))
+		f.WriteString(fmt.Sprintf("[%s] [%s] %s", loggerData.Timestamp.Format("2006-01-02 15:04:05.0000"), loggerData.LoggerLevel, loggerData.Message))
 		for k, v := range loggerData.MetaData {
 			typeName := reflect.TypeOf(v).Name()
 			if strings.Contains(typeName, "int") {
