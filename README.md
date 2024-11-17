@@ -12,6 +12,6 @@ GO_TELEMETRY_FILE_NAME=<DEFAULT:telemetry-config.yml> # The file name of the tel
 
 ```YAML
 logger:
-  level: <off|info|warning|debug|error>
-  outputWriter: <cli|jsonFile|textFile>
+  level: <off|info|warning|debug|error> # Default: off
+  outputWriter: <cli|jsonFile|textFile> # Default: cli
 ```

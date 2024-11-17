@@ -2,7 +2,6 @@ package logging
 
 import (
 	"fmt"
-	"go-telemetry/config"
 	"sync"
 	"time"
 )
@@ -10,35 +9,35 @@ import (
 type MetaData = map[string]any
 
 type LoggerData struct {
-	LoggerLevel LoggerLevel `json:"loggerLevel"`
+	LoggerLevel loggerLevel `json:"loggerLevel"`
 	Timestamp   time.Time   `json:"timestamp"`
 	Message     string      `json:"message"`
 	MetaData    MetaData    `json:"metaData"`
 }
 
-type Log struct {
-	loggerLevel LoggerLevel
+type logging struct {
+	loggerLevel loggerLevel
 	outputWrite LogOutputWriter
 }
 
 var loggerOnce sync.Once
-var loggerInstance *Log
+var loggerInstance *logging
 var writeLogOutputMutex sync.Mutex
 
-func NewLog(options ...func(*Log)) *Log {
+func NewLog(options ...func(*logging)) *logging {
 	loggerOnce.Do(func() {
-		config.Init()
+		initConfig()
 
-		loggerInstance = &Log{}
+		loggerInstance = &logging{}
 
-		switch config.LoggerConfig.Logger.Level {
+		switch loggerConfig.Logger.Level {
 		case string(LevelOff), string(LevelInfo), string(LevelWarning), string(LevelError), string(LevelDebug):
-			loggerInstance.loggerLevel = LoggerLevel(config.LoggerConfig.Logger.Level)
+			loggerInstance.loggerLevel = loggerLevel(loggerConfig.Logger.Level)
 		default:
-			loggerInstance.loggerLevel = LevelInfo
+			loggerInstance.loggerLevel = LevelOff
 		}
 
-		switch config.LoggerConfig.Logger.OutputWriter {
+		switch loggerConfig.Logger.OutputWriter {
 		case string(cli):
 			loggerInstance.outputWrite = CLILogOutputWrite()
 		case string(jsonFile):
@@ -57,35 +56,35 @@ func NewLog(options ...func(*Log)) *Log {
 	return loggerInstance
 }
 
-func WithLoggerLevel(loggerLevel LoggerLevel) func(*Log) {
-	return func(l *Log) {
+func WithLoggerLevel(loggerLevel loggerLevel) func(*logging) {
+	return func(l *logging) {
 		l.loggerLevel = loggerLevel
 	}
 }
 
-func WithLogOutputWriter(outputWriter LogOutputWriter) func(*Log) {
-	return func(l *Log) {
+func WithLogOutputWriter(outputWriter LogOutputWriter) func(*logging) {
+	return func(l *logging) {
 		l.outputWrite = outputWriter
 	}
 }
 
-func (l *Log) Info(msg string, v MetaData) {
+func (l *logging) Info(msg string, v MetaData) {
 	l.processLoggerData(LevelInfo, msg, v)
 }
 
-func (l *Log) Warning(msg string, v MetaData) {
+func (l *logging) Warning(msg string, v MetaData) {
 	l.processLoggerData(LevelWarning, msg, v)
 }
 
-func (l *Log) Error(msg string, v MetaData) {
+func (l *logging) Error(msg string, v MetaData) {
 	l.processLoggerData(LevelError, msg, v)
 }
 
-func (l *Log) Debug(msg string, v MetaData) {
+func (l *logging) Debug(msg string, v MetaData) {
 	l.processLoggerData(LevelDebug, msg, v)
 }
 
-func (l *Log) processLoggerData(loggerLevel LoggerLevel, msg string, metaData MetaData) {
+func (l *logging) processLoggerData(loggerLevel loggerLevel, msg string, metaData MetaData) {
 	if convertLoggerLevelToInt(loggerLevel) <= convertLoggerLevelToInt(l.loggerLevel) {
 		writeLogOutputMutex.Lock()
 		err := l.outputWrite(&LoggerData{

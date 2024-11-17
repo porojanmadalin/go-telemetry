@@ -2,52 +2,51 @@ package logging
 
 import (
 	"fmt"
-	"go-telemetry/config"
 	"sync"
 	"time"
 )
 
 type TransactionLoggerData struct {
-	LoggerLevel LoggerLevel `json:"loggerLevel"`
+	LoggerLevel loggerLevel `json:"loggerLevel"`
 	Timestamps  []time.Time `json:"timestamps"`
 	Messages    []string    `json:"messages"`
 	MetaDatas   []MetaData  `json:"metaDatas"`
 }
 
-type TransactionLog struct {
+type transactionLogging struct {
 	transactionId string
-	loggerLevel   LoggerLevel
+	loggerLevel   loggerLevel
 	outputWrite   TransactionLogOutputWriter
 }
 
-type TransactionMap struct {
+type transactionMap struct {
 	sync.Map
 }
 
 var transactionLoggerOnce sync.Once
-var transactionLoggerInstance *TransactionLog
+var transactionLoggerInstance *transactionLogging
 
-var availableTransactions *TransactionMap // using hash map for increased read/write performance
+var availableTransactions *transactionMap // using hash map for increased read/write performance
 
 var addLogMutex sync.Mutex
 var writeTransactionLogOutputMutex sync.Mutex
 
-func NewTransactionLog(transactionId string, options ...func(*TransactionLog)) *TransactionLog {
+func NewTransactionLog(transactionId string, options ...func(*transactionLogging)) *transactionLogging {
 	transactionLoggerOnce.Do(func() {
-		config.Init()
+		initConfig()
 
-		transactionLoggerInstance = &TransactionLog{}
+		transactionLoggerInstance = &transactionLogging{}
 
-		availableTransactions = &TransactionMap{}
+		availableTransactions = &transactionMap{}
 
-		switch config.LoggerConfig.Logger.Level {
+		switch loggerConfig.Logger.Level {
 		case string(LevelOff), string(LevelInfo), string(LevelWarning), string(LevelError), string(LevelDebug):
-			transactionLoggerInstance.loggerLevel = LoggerLevel(config.LoggerConfig.Logger.Level)
+			transactionLoggerInstance.loggerLevel = loggerLevel(loggerConfig.Logger.Level)
 		default:
 			transactionLoggerInstance.loggerLevel = LevelInfo
 		}
 
-		switch config.LoggerConfig.Logger.OutputWriter {
+		switch loggerConfig.Logger.OutputWriter {
 		case string(cli):
 			transactionLoggerInstance.outputWrite = CLITransactionLogOutputWrite()
 		case string(jsonFile):
@@ -69,35 +68,35 @@ func NewTransactionLog(transactionId string, options ...func(*TransactionLog)) *
 	return transactionLoggerInstance
 }
 
-func WithTransactionLoggerLevel(loggerLevel LoggerLevel) func(*TransactionLog) {
-	return func(l *TransactionLog) {
+func WithTransactionLoggerLevel(loggerLevel loggerLevel) func(*transactionLogging) {
+	return func(l *transactionLogging) {
 		l.loggerLevel = loggerLevel
 	}
 }
 
-func WithTransactionLogOutputWriter(outputWriter TransactionLogOutputWriter) func(*TransactionLog) {
-	return func(l *TransactionLog) {
+func WithTransactionLogOutputWriter(outputWriter TransactionLogOutputWriter) func(*transactionLogging) {
+	return func(l *transactionLogging) {
 		l.outputWrite = outputWriter
 	}
 }
 
-func (l *TransactionLog) Info(msg string, v MetaData) {
+func (l *transactionLogging) Info(msg string, v MetaData) {
 	l.processLoggerData(LevelInfo, msg, v)
 }
 
-func (l *TransactionLog) Warning(msg string, v MetaData) {
+func (l *transactionLogging) Warning(msg string, v MetaData) {
 	l.processLoggerData(LevelWarning, msg, v)
 }
 
-func (l *TransactionLog) Error(msg string, v MetaData) {
+func (l *transactionLogging) Error(msg string, v MetaData) {
 	l.processLoggerData(LevelError, msg, v)
 }
 
-func (l *TransactionLog) Debug(msg string, v MetaData) {
+func (l *transactionLogging) Debug(msg string, v MetaData) {
 	l.processLoggerData(LevelDebug, msg, v)
 }
 
-func (l *TransactionLog) processLoggerData(loggerLevel LoggerLevel, msg string, metaData MetaData) {
+func (l *transactionLogging) processLoggerData(loggerLevel loggerLevel, msg string, metaData MetaData) {
 	if convertLoggerLevelToInt(loggerLevel) <= convertLoggerLevelToInt(l.loggerLevel) {
 		err := l.addLogToTransaction(&LoggerData{LoggerLevel: loggerLevel, Message: msg, MetaData: metaData})
 		if err != nil {
@@ -106,7 +105,7 @@ func (l *TransactionLog) processLoggerData(loggerLevel LoggerLevel, msg string, 
 	}
 }
 
-func (l *TransactionLog) addLogToTransaction(log *LoggerData) error {
+func (l *transactionLogging) addLogToTransaction(log *LoggerData) error {
 	foundTransaction, ok := availableTransactions.Load(l.transactionId)
 	if !ok {
 		return fmt.Errorf("error: the provided transaction was not started or was recently ended  %s", l.transactionId)
@@ -129,7 +128,7 @@ func (l *TransactionLog) addLogToTransaction(log *LoggerData) error {
 	return nil
 }
 
-func (l *TransactionLog) StartTransaction() error {
+func (l *transactionLogging) StartTransaction() error {
 	if l.loggerLevel == LevelOff {
 		return nil
 	}
@@ -146,7 +145,7 @@ func (l *TransactionLog) StartTransaction() error {
 	return nil
 }
 
-func (l *TransactionLog) StopTransaction() error {
+func (l *transactionLogging) StopTransaction() error {
 	if l.loggerLevel == LevelOff {
 		return nil
 	}

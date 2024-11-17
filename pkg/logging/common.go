@@ -2,20 +2,20 @@ package logging
 
 const (
 	// Logger levels
-	LevelOff     LoggerLevel = "off"     // 0
-	LevelInfo    LoggerLevel = "info"    // 1
-	LevelWarning LoggerLevel = "warning" // 2
-	LevelError   LoggerLevel = "error"   // 3
-	LevelDebug   LoggerLevel = "debug"   // 4
+	LevelOff     loggerLevel = "off"     // 0
+	LevelInfo    loggerLevel = "info"    // 1
+	LevelWarning loggerLevel = "warning" // 2
+	LevelError   loggerLevel = "error"   // 3
+	LevelDebug   loggerLevel = "debug"   // 4
 )
 
 const (
 	// Logger levels
-	LevelOffInt     int = 0
-	LevelInfoInt    int = 1
-	LevelWarningInt int = 2
-	LevelErrorInt   int = 3
-	LevelDebugInt   int = 4
+	levelOffInt     int = 0
+	levelInfoInt    int = 1
+	levelWarningInt int = 2
+	levelErrorInt   int = 3
+	levelDebugInt   int = 4
 )
 
 const (
@@ -24,28 +24,23 @@ const (
 	textFile OutputWriterType = "textFile"
 )
 
-type LoggerLevel string
+type loggerLevel string
 
 type OutputWriterType string
 
-type Loggers struct {
-	Log
-	TransactionLog
-}
-
-func convertLoggerLevelToInt(loggerLevel LoggerLevel) int {
+func convertLoggerLevelToInt(loggerLevel loggerLevel) int {
 	switch loggerLevel {
 	case LevelOff:
-		return 0
+		return levelOffInt
 	case LevelInfo:
-		return 1
+		return levelInfoInt
 	case LevelWarning:
-		return 2
+		return levelWarningInt
 	case LevelError:
-		return 3
+		return levelErrorInt
 	case LevelDebug:
-		return 4
+		return levelDebugInt
 	default:
-		return 1
+		return levelOffInt
 	}
 }
