@@ -1,4 +1,4 @@
-package logging
+package config
 
 import (
 	"log"
@@ -21,13 +21,13 @@ type config struct {
 }
 
 var configOnce sync.Once
-var loggerConfig config
+var LoggerConfig config
 
-func initConfig() config {
+func Init() config {
 	configOnce.Do(func() {
-		loggerConfig = loadConfig()
+		LoggerConfig = loadConfig()
 	})
-	return loggerConfig
+	return LoggerConfig
 }
 
 func loadConfig() config {

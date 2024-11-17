@@ -2,6 +2,7 @@ package logging
 
 import (
 	"fmt"
+	"go-telemetry/pkg/internal/config"
 	"sync"
 	"time"
 )
@@ -26,18 +27,18 @@ var writeLogOutputMutex sync.Mutex
 
 func NewLog(options ...func(*logging)) *logging {
 	loggerOnce.Do(func() {
-		initConfig()
+		config.Init()
 
 		loggerInstance = &logging{}
 
-		switch loggerConfig.Logger.Level {
+		switch config.LoggerConfig.Logger.Level {
 		case string(LevelOff), string(LevelInfo), string(LevelWarning), string(LevelError), string(LevelDebug):
-			loggerInstance.loggerLevel = loggerLevel(loggerConfig.Logger.Level)
+			loggerInstance.loggerLevel = loggerLevel(config.LoggerConfig.Logger.Level)
 		default:
 			loggerInstance.loggerLevel = LevelOff
 		}
 
-		switch loggerConfig.Logger.OutputWriter {
+		switch config.LoggerConfig.Logger.OutputWriter {
 		case string(cli):
 			loggerInstance.outputWrite = CLILogOutputWrite()
 		case string(jsonFile):
