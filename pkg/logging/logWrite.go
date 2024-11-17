@@ -7,14 +7,7 @@ import (
 	"os"
 	"reflect"
 	"strings"
-)
-
-const (
-	// JSON File Writer Constants
-	startArray      = "[\n"
-	endArray        = "\n]"
-	indent          = "  "
-	objectDelimiter = ",\n" + indent
+	"time"
 )
 
 type LogOutputWriter func(*LoggerData) error
@@ -42,7 +35,7 @@ func CLILogOutputWrite() LogOutputWriter {
 
 func JSONLogOutputFileWrite() LogOutputWriter {
 	return func(loggerData *LoggerData) error {
-		fileName := fmt.Sprintf("%s.json", loggerData.Timestamp.Format("2006-01-02"))
+		fileName := fmt.Sprintf("%s.json", time.Now().Format("2006-01-02"))
 		f, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE, 0644)
 		if err != nil {
 			return fmt.Errorf("error: could not open json file %v", err)
@@ -85,7 +78,7 @@ func JSONLogOutputFileWrite() LogOutputWriter {
 
 func TextLogOutputFileWrite() LogOutputWriter {
 	return func(loggerData *LoggerData) error {
-		fileName := fmt.Sprintf("%s.log", loggerData.Timestamp.Format("2006-01-02"))
+		fileName := fmt.Sprintf("%s.log", time.Now().Format("2006-01-02"))
 		f, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 		if err != nil {
 			return fmt.Errorf("error: could not open text file %v", err)
