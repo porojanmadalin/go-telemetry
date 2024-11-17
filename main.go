@@ -5,9 +5,8 @@ import (
 )
 
 func main() {
-	//TODO: add a transaction started/finished fn
 
-	log := logging.New()
+	log := logging.NewLog()
 
 	log.Debug("Hello", map[string]any{
 		"VarInt":  1,

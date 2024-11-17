@@ -1,6 +1,7 @@
 package logging
 
 import (
+	"fmt"
 	"go-telemetry/config"
 	"sync"
 	"time"
@@ -23,7 +24,7 @@ type Log struct {
 var loggerOnce sync.Once
 var loggerInstance *Log
 
-func New(options ...func(*Log)) *Log {
+func NewLog(options ...func(*Log)) *Log {
 	loggerOnce.Do(func() {
 		config.Init()
 
@@ -64,5 +65,35 @@ func WithLoggerLevel(loggerLevel LoggerLevel) func(*Log) {
 func WithLogOutputWriter(outputWriter LogOutputWriter) func(*Log) {
 	return func(l *Log) {
 		l.outputWrite = outputWriter
+	}
+}
+
+func (l *Log) Info(msg string, v MetaData) {
+	l.processLoggerData(LevelInfo, msg, v)
+}
+
+func (l *Log) Warning(msg string, v MetaData) {
+	l.processLoggerData(LevelWarning, msg, v)
+}
+
+func (l *Log) Error(msg string, v MetaData) {
+	l.processLoggerData(LevelError, msg, v)
+}
+
+func (l *Log) Debug(msg string, v MetaData) {
+	l.processLoggerData(LevelDebug, msg, v)
+}
+
+func (l *Log) processLoggerData(loggerLevel LoggerLevel, msg string, metaData MetaData) {
+	if convertLoggerLevelToInt(loggerLevel) <= convertLoggerLevelToInt(l.loggerLevel) {
+		err := l.outputWrite(&LoggerData{
+			Timestamp:   time.Now(),
+			LoggerLevel: loggerLevel,
+			Message:     msg,
+			MetaData:    metaData,
+		})
+		if err != nil {
+			fmt.Println(err)
+		}
 	}
 }

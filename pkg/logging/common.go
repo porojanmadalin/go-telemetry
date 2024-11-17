@@ -1,10 +1,5 @@
 package logging
 
-import (
-	"fmt"
-	"time"
-)
-
 const (
 	// Logger levels
 	LevelOff     LoggerLevel = "off"     // 0
@@ -33,6 +28,11 @@ type LoggerLevel string
 
 type OutputWriterType string
 
+type Loggers struct {
+	Log
+	TransactionLog
+}
+
 func convertLoggerLevelToInt(loggerLevel LoggerLevel) int {
 	switch loggerLevel {
 	case LevelOff:
@@ -47,35 +47,5 @@ func convertLoggerLevelToInt(loggerLevel LoggerLevel) int {
 		return 4
 	default:
 		return 1
-	}
-}
-
-func (l *Log) Info(msg string, v MetaData) {
-	l.processLoggerData(LevelInfo, msg, v)
-}
-
-func (l *Log) Warning(msg string, v MetaData) {
-	l.processLoggerData(LevelWarning, msg, v)
-}
-
-func (l *Log) Error(msg string, v MetaData) {
-	l.processLoggerData(LevelError, msg, v)
-}
-
-func (l *Log) Debug(msg string, v MetaData) {
-	l.processLoggerData(LevelDebug, msg, v)
-}
-
-func (l *Log) processLoggerData(loggerLevel LoggerLevel, msg string, metaData MetaData) {
-	if convertLoggerLevelToInt(loggerLevel) <= convertLoggerLevelToInt(l.loggerLevel) {
-		err := l.outputWrite(&LoggerData{
-			Timestamp:   time.Now(),
-			LoggerLevel: loggerLevel,
-			Message:     msg,
-			MetaData:    metaData,
-		})
-		if err != nil {
-			fmt.Println(err)
-		}
 	}
 }
