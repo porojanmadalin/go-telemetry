@@ -2,6 +2,7 @@ package logging
 
 import (
 	"fmt"
+	"go-telemetry/pkg/internal/config"
 	"sync"
 	"time"
 )
@@ -32,7 +33,7 @@ var writeTransactionLogOutputMutex sync.Mutex
 
 func NewTransactionLog(transactionId string, options ...func(*transactionLogging)) (*transactionLogging, error) {
 	transactionLoggerOnce.Do(func() {
-		initConfig()
+		config.Init()
 
 		availableTransactions = &transactionMap{}
 
@@ -40,14 +41,14 @@ func NewTransactionLog(transactionId string, options ...func(*transactionLogging
 
 	transactionLoggerInstance = &transactionLogging{}
 
-	switch loggerConfig.Logger.Level {
+	switch config.LoggerConfig.Logger.Level {
 	case string(LevelOff), string(LevelInfo), string(LevelWarning), string(LevelError), string(LevelDebug):
-		transactionLoggerInstance.loggerLevel = loggerLevel(loggerConfig.Logger.Level)
+		transactionLoggerInstance.loggerLevel = loggerLevel(config.LoggerConfig.Logger.Level)
 	default:
 		transactionLoggerInstance.loggerLevel = LevelInfo
 	}
 
-	switch loggerConfig.Logger.OutputWriter {
+	switch config.LoggerConfig.Logger.OutputWriter {
 	case string(cli):
 		transactionLoggerInstance.outputWrite = CLITransactionLogOutputWrite()
 	case string(jsonFile):
