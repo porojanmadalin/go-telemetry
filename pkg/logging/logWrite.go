@@ -7,7 +7,6 @@ import (
 	"os"
 	"reflect"
 	"strings"
-	"sync"
 )
 
 const (
@@ -19,8 +18,6 @@ const (
 )
 
 type LogOutputWriter func(*LoggerData) error
-
-var writeToLogFileMutex sync.Mutex
 
 func CLILogOutputWrite() LogOutputWriter {
 	return func(loggerData *LoggerData) error {
@@ -44,11 +41,7 @@ func CLILogOutputWrite() LogOutputWriter {
 }
 
 func JSONLogOutputFileWrite() LogOutputWriter {
-	// TODO: take into account that multiple writes can occur on the same file
 	return func(loggerData *LoggerData) error {
-		writeToLogFileMutex.Lock()
-		defer writeToLogFileMutex.Unlock()
-
 		fileName := fmt.Sprintf("%s.json", loggerData.Timestamp.Format("2006-01-02"))
 		f, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE, 0644)
 		if err != nil {
@@ -92,9 +85,6 @@ func JSONLogOutputFileWrite() LogOutputWriter {
 
 func TextLogOutputFileWrite() LogOutputWriter {
 	return func(loggerData *LoggerData) error {
-		writeToLogFileMutex.Lock()
-		defer writeToLogFileMutex.Unlock()
-
 		fileName := fmt.Sprintf("%s.log", loggerData.Timestamp.Format("2006-01-02"))
 		f, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 		if err != nil {

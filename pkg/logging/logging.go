@@ -23,6 +23,7 @@ type Log struct {
 
 var loggerOnce sync.Once
 var loggerInstance *Log
+var writeLogOutputMutex sync.Mutex
 
 func NewLog(options ...func(*Log)) *Log {
 	loggerOnce.Do(func() {
@@ -86,6 +87,7 @@ func (l *Log) Debug(msg string, v MetaData) {
 
 func (l *Log) processLoggerData(loggerLevel LoggerLevel, msg string, metaData MetaData) {
 	if convertLoggerLevelToInt(loggerLevel) <= convertLoggerLevelToInt(l.loggerLevel) {
+		writeLogOutputMutex.Lock()
 		err := l.outputWrite(&LoggerData{
 			Timestamp:   time.Now(),
 			LoggerLevel: loggerLevel,
@@ -95,5 +97,6 @@ func (l *Log) processLoggerData(loggerLevel LoggerLevel, msg string, metaData Me
 		if err != nil {
 			fmt.Println(err)
 		}
+		writeLogOutputMutex.Unlock()
 	}
 }

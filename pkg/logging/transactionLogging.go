@@ -30,6 +30,7 @@ var transactionLoggerInstance *TransactionLog
 var availableTransactions *TransactionMap // using hash map for increased read/write performance
 
 var addLogMutex sync.Mutex
+var writeTransactionLogOutputMutex sync.Mutex
 
 func NewTransactionLog(transactionId string, options ...func(*TransactionLog)) *TransactionLog {
 	transactionLoggerOnce.Do(func() {
@@ -164,6 +165,10 @@ func (l *TransactionLog) StopTransaction() error {
 	}
 
 	// found transaction should not contain logs that do not sattisfy the log level set prior
+
+	writeTransactionLogOutputMutex.Lock()
+	defer writeTransactionLogOutputMutex.Unlock()
+
 	err := l.outputWrite(&foundTransactionTyped)
 	if err != nil {
 		fmt.Println(err)
