@@ -30,10 +30,10 @@ type LoggerLevel string
 type MetaData = map[string]any
 
 type LoggerData struct {
-	LoggerLevel LoggerLevel
-	Timestamp   time.Time
-	Message     string
-	MetaData    MetaData
+	LoggerLevel LoggerLevel `json:"loggerLevel"`
+	Timestamp   time.Time   `json:"timestamp"`
+	Message     string      `json:"message"`
+	MetaData    MetaData    `json:"metaData"`
 }
 
 type Log struct {
