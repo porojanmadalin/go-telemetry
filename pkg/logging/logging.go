@@ -1,31 +1,10 @@
 package logging
 
 import (
-	"fmt"
 	"go-telemetry/config"
 	"sync"
 	"time"
 )
-
-const (
-	// Logger levels
-	LevelOff     LoggerLevel = "off"     // 0
-	LevelInfo    LoggerLevel = "info"    // 1
-	LevelWarning LoggerLevel = "warning" // 2
-	LevelError   LoggerLevel = "error"   // 3
-	LevelDebug   LoggerLevel = "debug"   // 4
-)
-
-const (
-	// Logger levels
-	LevelOffInt     int = 0
-	LevelInfoInt    int = 1
-	LevelWarningInt int = 2
-	LevelErrorInt   int = 3
-	LevelDebugInt   int = 4
-)
-
-type LoggerLevel string
 
 type MetaData = map[string]any
 
@@ -38,7 +17,7 @@ type LoggerData struct {
 
 type Log struct {
 	loggerLevel LoggerLevel
-	outputWrite OutputWriter
+	outputWrite LogOutputWriter
 }
 
 var loggerOnce sync.Once
@@ -59,13 +38,13 @@ func New(options ...func(*Log)) *Log {
 
 		switch config.LoggerConfig.Logger.OutputWriter {
 		case string(cli):
-			loggerInstance.outputWrite = CLIOutputWrite()
+			loggerInstance.outputWrite = CLILogOutputWrite()
 		case string(jsonFile):
-			loggerInstance.outputWrite = JSONOutputFileWrite()
+			loggerInstance.outputWrite = JSONLogOutputFileWrite()
 		case string(textFile):
-			loggerInstance.outputWrite = TextOutputFileWrite()
+			loggerInstance.outputWrite = TextLogOutputFileWrite()
 		default:
-			loggerInstance.outputWrite = CLIOutputWrite()
+			loggerInstance.outputWrite = CLILogOutputWrite()
 		}
 
 		// Log options override the YAML file configuration
@@ -82,55 +61,8 @@ func WithLoggerLevel(loggerLevel LoggerLevel) func(*Log) {
 	}
 }
 
-func WithOutputWriter(outputWriter OutputWriter) func(*Log) {
+func WithLogOutputWriter(outputWriter LogOutputWriter) func(*Log) {
 	return func(l *Log) {
 		l.outputWrite = outputWriter
-	}
-}
-
-func convertLoggerLevelToInt(loggerLevel LoggerLevel) int {
-	switch loggerLevel {
-	case LevelOff:
-		return 0
-	case LevelInfo:
-		return 1
-	case LevelWarning:
-		return 2
-	case LevelError:
-		return 3
-	case LevelDebug:
-		return 4
-	default:
-		return 1
-	}
-}
-
-func (l *Log) Info(msg string, v MetaData) {
-	l.processLoggerData(LevelInfo, msg, v)
-}
-
-func (l *Log) Warning(msg string, v MetaData) {
-	l.processLoggerData(LevelWarning, msg, v)
-}
-
-func (l *Log) Error(msg string, v MetaData) {
-	l.processLoggerData(LevelError, msg, v)
-}
-
-func (l *Log) Debug(msg string, v MetaData) {
-	l.processLoggerData(LevelDebug, msg, v)
-}
-
-func (l *Log) processLoggerData(loggerLevel LoggerLevel, msg string, metaData MetaData) {
-	if convertLoggerLevelToInt(loggerLevel) <= convertLoggerLevelToInt(l.loggerLevel) {
-		err := l.outputWrite(&LoggerData{
-			Timestamp:   time.Now(),
-			LoggerLevel: loggerLevel,
-			Message:     msg,
-			MetaData:    metaData,
-		})
-		if err != nil {
-			fmt.Println(err)
-		}
 	}
 }
