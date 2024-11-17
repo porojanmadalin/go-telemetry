@@ -88,7 +88,7 @@ func TextLogOutputFileWrite() LogOutputWriter {
 		fileName := fmt.Sprintf("%s.log", loggerData.Timestamp.Format("2006-01-02"))
 		f, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 		if err != nil {
-			return fmt.Errorf("error: could not open json file %v", err)
+			return fmt.Errorf("error: could not open text file %v", err)
 		}
 		defer f.Close()
 

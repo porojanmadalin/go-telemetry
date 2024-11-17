@@ -152,6 +152,7 @@ func (l *transactionLogging) StopTransactionLogging() error {
 	if l.loggerLevel == LevelOff {
 		return nil
 	}
+	endTimestamp := time.Now()
 
 	fmt.Printf("info: Will end logging transaction in 5 seconds %s\n", l.transactionId)
 	time.Sleep(5 * time.Second)
@@ -171,7 +172,7 @@ func (l *transactionLogging) StopTransactionLogging() error {
 	writeTransactionLogOutputMutex.Lock()
 	defer writeTransactionLogOutputMutex.Unlock()
 
-	err := l.outputWrite(l.transactionId, l.startTimestamp, time.Now(), foundTransactionTyped)
+	err := l.outputWrite(l.transactionId, l.startTimestamp, endTimestamp, foundTransactionTyped)
 	if err != nil {
 		fmt.Println(err)
 		return err
