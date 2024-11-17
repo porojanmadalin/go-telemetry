@@ -24,6 +24,14 @@ const (
 	textFile OutputWriterType = "textFile"
 )
 
+const (
+	// JSON File Writer Constants
+	startArray      = "[\n"
+	endArray        = "\n]"
+	indent          = "  "
+	objectDelimiter = ",\n" + indent
+)
+
 type loggerLevel string
 
 type OutputWriterType string
