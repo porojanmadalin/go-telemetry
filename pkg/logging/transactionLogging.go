@@ -7,16 +7,15 @@ import (
 )
 
 type TransactionLoggerData struct {
-	LoggerLevel loggerLevel `json:"loggerLevel"`
-	Timestamps  []time.Time `json:"timestamps"`
-	Messages    []string    `json:"messages"`
-	MetaDatas   []MetaData  `json:"metaDatas"`
+	LoggerLevel     loggerLevel   `json:"loggerLevel"`
+	TransactionLogs []*LoggerData `json:"transactionLogs"`
 }
 
 type transactionLogging struct {
-	transactionId string
-	loggerLevel   loggerLevel
-	outputWrite   TransactionLogOutputWriter
+	transactionId  string
+	loggerLevel    loggerLevel
+	startTimestamp time.Time
+	outputWrite    TransactionLogOutputWriter
 }
 
 type transactionMap struct {
@@ -98,7 +97,7 @@ func (l *transactionLogging) Debug(msg string, v MetaData) {
 
 func (l *transactionLogging) processLoggerData(loggerLevel loggerLevel, msg string, metaData MetaData) {
 	if convertLoggerLevelToInt(loggerLevel) <= convertLoggerLevelToInt(l.loggerLevel) {
-		err := l.addLogToTransaction(&LoggerData{LoggerLevel: loggerLevel, Message: msg, MetaData: metaData})
+		err := l.addLogToTransaction(&LoggerData{LoggerLevel: loggerLevel, Timestamp: time.Now(), Message: msg, MetaData: metaData})
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -108,44 +107,42 @@ func (l *transactionLogging) processLoggerData(loggerLevel loggerLevel, msg stri
 func (l *transactionLogging) addLogToTransaction(log *LoggerData) error {
 	foundTransaction, ok := availableTransactions.Load(l.transactionId)
 	if !ok {
-		return fmt.Errorf("error: the provided transaction was not started or was recently ended  %s", l.transactionId)
+		return fmt.Errorf("error: the provided transaction was not started or was recently ended %s", l.transactionId)
 	}
 
-	foundTransactionTyped, ok := foundTransaction.(TransactionLoggerData)
+	foundTransactionTyped, ok := foundTransaction.(*TransactionLoggerData)
 	if !ok {
-		return fmt.Errorf("error: the stored transaction is of unknown type  %s", l.transactionId)
+		return fmt.Errorf("error: the stored transaction is of unknown type %s", l.transactionId)
 	}
 
 	addLogMutex.Lock()
 	newTransaction := &TransactionLoggerData{
-		LoggerLevel: foundTransactionTyped.LoggerLevel,
-		Timestamps:  append(foundTransactionTyped.Timestamps, log.Timestamp),
-		Messages:    append(foundTransactionTyped.Messages, log.Message),
-		MetaDatas:   append(foundTransactionTyped.MetaDatas, log.MetaData),
+		LoggerLevel:     foundTransactionTyped.LoggerLevel,
+		TransactionLogs: append(foundTransactionTyped.TransactionLogs, log),
 	}
 	availableTransactions.CompareAndSwap(l.transactionId, foundTransactionTyped, newTransaction)
 	addLogMutex.Unlock()
 	return nil
 }
 
-func (l *transactionLogging) StartTransaction() error {
+func (l *transactionLogging) StartTransactionLogging() error {
 	if l.loggerLevel == LevelOff {
 		return nil
 	}
 
 	if _, loaded := availableTransactions.LoadOrStore(l.transactionId, &TransactionLoggerData{
-		Timestamps:  []time.Time{},
-		LoggerLevel: l.loggerLevel,
-		Messages:    []string{},
-		MetaDatas:   []MetaData{},
+		LoggerLevel:     l.loggerLevel,
+		TransactionLogs: []*LoggerData{},
 	}); loaded {
 		return fmt.Errorf("error: the provided transaction was already started %s", l.transactionId)
 	}
 
+	l.startTimestamp = time.Now()
+
 	return nil
 }
 
-func (l *transactionLogging) StopTransaction() error {
+func (l *transactionLogging) StopTransactionLogging() error {
 	if l.loggerLevel == LevelOff {
 		return nil
 	}
@@ -155,12 +152,12 @@ func (l *transactionLogging) StopTransaction() error {
 
 	foundTransaction, loaded := availableTransactions.LoadAndDelete(l.transactionId)
 	if !loaded {
-		return fmt.Errorf("error: the provided transaction was not started or was recently ended  %s", l.transactionId)
+		return fmt.Errorf("error: the provided transaction was not started or was recently ended %s", l.transactionId)
 	}
 
-	foundTransactionTyped, ok := foundTransaction.(TransactionLoggerData)
+	foundTransactionTyped, ok := foundTransaction.(*TransactionLoggerData)
 	if !ok {
-		return fmt.Errorf("error: the stored transaction is of unknown type  %s", l.transactionId)
+		return fmt.Errorf("error: the stored transaction is of unknown type %s", l.transactionId)
 	}
 
 	// found transaction should not contain logs that do not sattisfy the log level set prior
@@ -168,7 +165,7 @@ func (l *transactionLogging) StopTransaction() error {
 	writeTransactionLogOutputMutex.Lock()
 	defer writeTransactionLogOutputMutex.Unlock()
 
-	err := l.outputWrite(&foundTransactionTyped)
+	err := l.outputWrite(l.transactionId, l.startTimestamp, time.Now(), foundTransactionTyped)
 	if err != nil {
 		fmt.Println(err)
 		return err
