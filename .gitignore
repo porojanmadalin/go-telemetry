@@ -25,11 +25,4 @@ go.work.sum
 .env
 
 # documents
-*.pdf
-
-# config
-telemetry-config.yml
-
-# logs
-*.log
-*.json
+.pdf
