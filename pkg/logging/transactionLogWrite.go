@@ -11,10 +11,10 @@ type TransactionLogOutputWriter func(transactionId string, startTimestamp time.T
 
 func CLITransactionLogOutputWrite() TransactionLogOutputWriter {
 	return func(transactionId string, startTimestamp time.Time, endTimeStamp time.Time, transactionLoggerData *TransactionLoggerData) error {
-		fmt.Printf("[%s] Transaction {%s} started!\n", startTimestamp.Format("2006-01-02 15:04:05"), transactionId)
+		fmt.Printf("[%s] Transaction {%s} started!\n", startTimestamp.Format("2006-01-02 15:04:05.0000"), transactionId)
 
 		for _, entry := range transactionLoggerData.TransactionLogs {
-			fmt.Printf("--> [%s] [%s] %s", entry.Timestamp.Format("2006-01-02 15:04:05"), entry.LoggerLevel, entry.Message)
+			fmt.Printf("--> [%s] [%s] %s", entry.Timestamp.Format("2006-01-02 15:04:05.0000"), entry.LoggerLevel, entry.Message)
 			for k, v := range entry.MetaData {
 				typeName := reflect.TypeOf(v).Name()
 				if strings.Contains(typeName, "int") {
@@ -31,7 +31,7 @@ func CLITransactionLogOutputWrite() TransactionLogOutputWriter {
 			fmt.Printf("\n")
 		}
 
-		fmt.Printf("[%s] Transaction {%s} ended!\n", endTimeStamp.Format("2006-01-02 15:04:05"), transactionId)
+		fmt.Printf("[%s] Transaction {%s} ended!\n", endTimeStamp.Format("2006-01-02 15:04:05.0000"), transactionId)
 		return nil
 	}
 }

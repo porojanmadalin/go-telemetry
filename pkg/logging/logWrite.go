@@ -21,7 +21,7 @@ type LogOutputWriter func(*LoggerData) error
 
 func CLILogOutputWrite() LogOutputWriter {
 	return func(loggerData *LoggerData) error {
-		fmt.Printf("[%s] [%s] %s", loggerData.Timestamp.Format("2006-01-02 15:04:05"), loggerData.LoggerLevel, loggerData.Message)
+		fmt.Printf("[%s] [%s] %s", loggerData.Timestamp.Format("2006-01-02 15:04:05.0000"), loggerData.LoggerLevel, loggerData.Message)
 		for k, v := range loggerData.MetaData {
 			typeName := reflect.TypeOf(v).Name()
 			if strings.Contains(typeName, "int") {
@@ -92,7 +92,7 @@ func TextLogOutputFileWrite() LogOutputWriter {
 		}
 		defer f.Close()
 
-		f.WriteString(fmt.Sprintf("[%s] [%s] %s", loggerData.Timestamp.Format("2006-01-02 15:04:05"), loggerData.LoggerLevel, loggerData.Message))
+		f.WriteString(fmt.Sprintf("[%s] [%s] %s", loggerData.Timestamp.Format("2006-01-02 15:04:05.0000"), loggerData.LoggerLevel, loggerData.Message))
 		for k, v := range loggerData.MetaData {
 			typeName := reflect.TypeOf(v).Name()
 			if strings.Contains(typeName, "int") {

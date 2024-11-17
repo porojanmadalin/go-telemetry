@@ -30,41 +30,47 @@ var availableTransactions *transactionMap // using hash map for increased read/w
 var addLogMutex sync.Mutex
 var writeTransactionLogOutputMutex sync.Mutex
 
-func NewTransactionLog(transactionId string, options ...func(*transactionLogging)) *transactionLogging {
+func NewTransactionLog(transactionId string, options ...func(*transactionLogging)) (*transactionLogging, error) {
 	transactionLoggerOnce.Do(func() {
 		initConfig()
 
-		transactionLoggerInstance = &transactionLogging{}
-
 		availableTransactions = &transactionMap{}
 
-		switch loggerConfig.Logger.Level {
-		case string(LevelOff), string(LevelInfo), string(LevelWarning), string(LevelError), string(LevelDebug):
-			transactionLoggerInstance.loggerLevel = loggerLevel(loggerConfig.Logger.Level)
-		default:
-			transactionLoggerInstance.loggerLevel = LevelInfo
-		}
-
-		switch loggerConfig.Logger.OutputWriter {
-		case string(cli):
-			transactionLoggerInstance.outputWrite = CLITransactionLogOutputWrite()
-		case string(jsonFile):
-			transactionLoggerInstance.outputWrite = JSONTransactionLogOutputFileWrite()
-		case string(textFile):
-			transactionLoggerInstance.outputWrite = TextTransactionLogOutputFileWrite()
-		default:
-			transactionLoggerInstance.outputWrite = CLITransactionLogOutputWrite()
-		}
-
-		// Log options override the YAML file configuration
-		for _, o := range options {
-			o(transactionLoggerInstance)
-		}
 	})
+
+	transactionLoggerInstance = &transactionLogging{}
+
+	switch loggerConfig.Logger.Level {
+	case string(LevelOff), string(LevelInfo), string(LevelWarning), string(LevelError), string(LevelDebug):
+		transactionLoggerInstance.loggerLevel = loggerLevel(loggerConfig.Logger.Level)
+	default:
+		transactionLoggerInstance.loggerLevel = LevelInfo
+	}
+
+	switch loggerConfig.Logger.OutputWriter {
+	case string(cli):
+		transactionLoggerInstance.outputWrite = CLITransactionLogOutputWrite()
+	case string(jsonFile):
+		transactionLoggerInstance.outputWrite = JSONTransactionLogOutputFileWrite()
+	case string(textFile):
+		transactionLoggerInstance.outputWrite = TextTransactionLogOutputFileWrite()
+	default:
+		transactionLoggerInstance.outputWrite = CLITransactionLogOutputWrite()
+	}
+
+	// Log options override the YAML file configuration
+	for _, o := range options {
+		o(transactionLoggerInstance)
+	}
+
+	if _, ok := availableTransactions.Load(transactionId); ok {
+		// do not give out reference to the same transaction, on multiple calls
+		return nil, fmt.Errorf("error: the provided transaction was already started %s", transactionId)
+	}
 
 	transactionLoggerInstance.transactionId = transactionId
 
-	return transactionLoggerInstance
+	return transactionLoggerInstance, nil
 }
 
 func WithTransactionLoggerLevel(loggerLevel loggerLevel) func(*transactionLogging) {
@@ -163,13 +169,13 @@ func (l *transactionLogging) StopTransactionLogging() error {
 	// found transaction should not contain logs that do not sattisfy the log level set prior
 
 	writeTransactionLogOutputMutex.Lock()
-	defer writeTransactionLogOutputMutex.Unlock()
-
 	err := l.outputWrite(l.transactionId, l.startTimestamp, time.Now(), foundTransactionTyped)
 	if err != nil {
 		fmt.Println(err)
+		writeTransactionLogOutputMutex.Unlock()
 		return err
 	}
+	writeTransactionLogOutputMutex.Unlock()
 
 	return nil
 }
