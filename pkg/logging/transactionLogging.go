@@ -7,6 +7,10 @@ import (
 	"time"
 )
 
+const (
+	waitDurationUntilTransactionStop = 2 * time.Second
+)
+
 type TransactionLoggerData struct {
 	LoggerLevel     loggerLevel   `json:"loggerLevel"`
 	TransactionLogs []*LoggerData `json:"transactionLogs"`
@@ -155,8 +159,8 @@ func (l *transactionLogging) StopTransactionLogging() error {
 	}
 	endTimestamp := time.Now()
 
-	fmt.Printf("info: Will end logging transaction in 5 seconds %s\n", l.transactionId)
-	time.Sleep(5 * time.Second)
+	fmt.Printf("info: Will end logging transaction in a couple of seconds %s\n", l.transactionId)
+	time.Sleep(waitDurationUntilTransactionStop)
 
 	foundTransaction, loaded := availableTransactions.LoadAndDelete(l.transactionId)
 	if !loaded {

@@ -138,3 +138,204 @@ func TestWithTransactionLogOutputWriter(t *testing.T) {
 	}
 	assert.Contains(t, fnName, CLITransactionLogOutputWriteName)
 }
+
+func TestTransactionLoggingOff(t *testing.T) {
+	transactionLoggerOnce = sync.Once{}
+	log, err := NewTransactionLog(testTransactionId, WithTransactionLoggerLevel(LevelOff))
+	if err != nil {
+		t.Fatalf("fatal: transaction log could not be initialized for transaction %s %v", testTransactionId, err)
+	}
+
+	bytes, err := itesting.CaptureOutput(func() error {
+		err := log.StartTransactionLogging()
+		if err != nil {
+			return err
+		}
+		log.Info("test info", nil)
+		log.Warning("test warning", nil)
+		log.Error("test error", nil)
+		log.Debug("test debug", nil)
+		err = log.StopTransactionLogging()
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	if err != nil {
+		t.Errorf("error: could not capture stdout output %v", err)
+		return
+	}
+
+	assert.NotContains(t, bytes, "test")
+	assert.NotContains(t, bytes, testTransactionId)
+	assert.NotContains(t, bytes, "started")
+	assert.NotContains(t, bytes, "ended")
+}
+
+func TestTransactionInfo(t *testing.T) {
+	transactionLoggerOnce = sync.Once{}
+	log, err := NewTransactionLog(testTransactionId, WithTransactionLoggerLevel(LevelInfo))
+	if err != nil {
+		t.Fatalf("fatal: transaction log could not be initialized for transaction %s %v", testTransactionId, err)
+	}
+
+	bytes, err := itesting.CaptureOutput(func() error {
+		err := log.StartTransactionLogging()
+		if err != nil {
+			return err
+		}
+		log.Info("test info", map[string]any{
+			"varInt":   0,
+			"varStr":   "string",
+			"varFloat": 3.14,
+		})
+		log.Warning("test warning", nil)
+		log.Error("test error", nil)
+		log.Debug("test debug", nil)
+		err = log.StopTransactionLogging()
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	if err != nil {
+		t.Fatalf("error: could not capture stdout output %v", err)
+	}
+
+	assert.Contains(t, bytes, testTransactionId)
+	assert.Contains(t, bytes, "started")
+	assert.Contains(t, bytes, "ended")
+	assert.Contains(t, bytes, "varInt=0")
+	assert.Contains(t, bytes, "varStr=string")
+	assert.Contains(t, bytes, "varFloat=3.14")
+	assert.Contains(t, bytes, "test info")
+	assert.NotContains(t, bytes, "test warning")
+	assert.NotContains(t, bytes, "test error")
+	assert.NotContains(t, bytes, "test debug")
+}
+
+func TestTransactionWarning(t *testing.T) {
+	transactionLoggerOnce = sync.Once{}
+	log, err := NewTransactionLog(testTransactionId, WithTransactionLoggerLevel(LevelWarning))
+	if err != nil {
+		t.Fatalf("fatal: transaction log could not be initialized for transaction %s %v", testTransactionId, err)
+	}
+
+	bytes, err := itesting.CaptureOutput(func() error {
+		err := log.StartTransactionLogging()
+		if err != nil {
+			return err
+		}
+		log.Warning("test warning", map[string]any{
+			"varInt":   0,
+			"varStr":   "string",
+			"varFloat": 3.14,
+		})
+		log.Info("test info", nil)
+		log.Error("test error", nil)
+		log.Debug("test debug", nil)
+		err = log.StopTransactionLogging()
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	if err != nil {
+		t.Fatalf("error: could not capture stdout output %v", err)
+	}
+
+	assert.Contains(t, bytes, testTransactionId)
+	assert.Contains(t, bytes, "started")
+	assert.Contains(t, bytes, "ended")
+	assert.Contains(t, bytes, "varInt=0")
+	assert.Contains(t, bytes, "varStr=string")
+	assert.Contains(t, bytes, "varFloat=3.14")
+	assert.Contains(t, bytes, "test info")
+	assert.Contains(t, bytes, "test warning")
+	assert.NotContains(t, bytes, "test error")
+	assert.NotContains(t, bytes, "test debug")
+}
+
+func TestTransactionError(t *testing.T) {
+	transactionLoggerOnce = sync.Once{}
+	log, err := NewTransactionLog(testTransactionId, WithTransactionLoggerLevel(LevelError))
+	if err != nil {
+		t.Fatalf("fatal: transaction log could not be initialized for transaction %s %v", testTransactionId, err)
+	}
+
+	bytes, err := itesting.CaptureOutput(func() error {
+		err := log.StartTransactionLogging()
+		if err != nil {
+			return err
+		}
+		log.Error("test error", map[string]any{
+			"varInt":   0,
+			"varStr":   "string",
+			"varFloat": 3.14,
+		})
+		log.Info("test info", nil)
+		log.Warning("test warning", nil)
+		log.Debug("test debug", nil)
+		err = log.StopTransactionLogging()
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	if err != nil {
+		t.Fatalf("error: could not capture stdout output %v", err)
+	}
+
+	assert.Contains(t, bytes, testTransactionId)
+	assert.Contains(t, bytes, "started")
+	assert.Contains(t, bytes, "ended")
+	assert.Contains(t, bytes, "varInt=0")
+	assert.Contains(t, bytes, "varStr=string")
+	assert.Contains(t, bytes, "varFloat=3.14")
+	assert.Contains(t, bytes, "test info")
+	assert.Contains(t, bytes, "test warning")
+	assert.Contains(t, bytes, "test error")
+	assert.NotContains(t, bytes, "test debug")
+}
+
+func TestTransactionDebug(t *testing.T) {
+	transactionLoggerOnce = sync.Once{}
+	log, err := NewTransactionLog(testTransactionId, WithTransactionLoggerLevel(LevelDebug))
+	if err != nil {
+		t.Fatalf("fatal: transaction log could not be initialized for transaction %s %v", testTransactionId, err)
+	}
+
+	bytes, err := itesting.CaptureOutput(func() error {
+		err := log.StartTransactionLogging()
+		if err != nil {
+			return err
+		}
+		log.Debug("test debug", map[string]any{
+			"varInt":   0,
+			"varStr":   "string",
+			"varFloat": 3.14,
+		})
+		log.Info("test info", nil)
+		log.Warning("test warning", nil)
+		log.Error("test error", nil)
+		err = log.StopTransactionLogging()
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	if err != nil {
+		t.Fatalf("error: could not capture stdout output %v", err)
+	}
+
+	assert.Contains(t, bytes, testTransactionId)
+	assert.Contains(t, bytes, "started")
+	assert.Contains(t, bytes, "ended")
+	assert.Contains(t, bytes, "varInt=0")
+	assert.Contains(t, bytes, "varStr=string")
+	assert.Contains(t, bytes, "varFloat=3.14")
+	assert.Contains(t, bytes, "test info")
+	assert.Contains(t, bytes, "test warning")
+	assert.Contains(t, bytes, "test error")
+	assert.Contains(t, bytes, "test debug")
+}
