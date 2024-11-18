@@ -14,12 +14,14 @@ const (
 	defaultConfigFileName = "telemetry-config.yml"
 )
 
+// A Logger is an environment values holder for logging
 type Logger struct {
 	Level        string `yaml:"level"`
 	OutputWriter string `yaml:"outputWriter"`
 	OutputDir    string `yaml:"outputDir"`
 }
 
+// A Config is a generic environment values holder
 type Config struct {
 	Logger Logger `yaml:"logger"`
 }
@@ -27,6 +29,7 @@ type Config struct {
 var configOnce sync.Once
 var LoggerConfig *Config
 
+// Init uses singleton pattern in order to load the configuration from a YAML file
 func Init() *Config {
 	configOnce.Do(func() {
 		LoggerConfig = loadConfig()
@@ -37,6 +40,7 @@ func Init() *Config {
 	return LoggerConfig
 }
 
+// loadConfig loads a YAML file into memory, that contains the library configuration set by the user
 func loadConfig() *Config {
 	configFileName := os.Getenv(configFilePathEnvKey)
 	if configFileName == "" {
