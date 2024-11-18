@@ -1,0 +1,87 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0" version="24.8.6">
+  <diagram name="Page-1" id="-Iovo9NZRVgcwGzgxB5J">
+    <mxGraphModel dx="860" dy="691" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="VIrZslOpK3xPOmjUwJWD-1" value="" style="ellipse;html=1;shape=startState;fillColor=#000000;strokeColor=#ff0000;" vertex="1" parent="1">
+          <mxGeometry x="220" y="200" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="VIrZslOpK3xPOmjUwJWD-2" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;verticalAlign=bottom;endArrow=open;endSize=8;strokeColor=#ff0000;rounded=0;" edge="1" source="VIrZslOpK3xPOmjUwJWD-1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="235" y="290" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="VIrZslOpK3xPOmjUwJWD-3" value="" style="ellipse;html=1;shape=endState;fillColor=#000000;strokeColor=#ff0000;" vertex="1" parent="1">
+          <mxGeometry x="220" y="590" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="VIrZslOpK3xPOmjUwJWD-7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="VIrZslOpK3xPOmjUwJWD-4" target="VIrZslOpK3xPOmjUwJWD-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="VIrZslOpK3xPOmjUwJWD-8" value="Choose Log Level" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="VIrZslOpK3xPOmjUwJWD-7">
+          <mxGeometry x="-0.0638" y="-2" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="VIrZslOpK3xPOmjUwJWD-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="VIrZslOpK3xPOmjUwJWD-4" target="VIrZslOpK3xPOmjUwJWD-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="VIrZslOpK3xPOmjUwJWD-14" value="Choose Output Writer" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="VIrZslOpK3xPOmjUwJWD-13">
+          <mxGeometry x="-0.3662" y="-1" relative="1" as="geometry">
+            <mxPoint x="16" y="-1" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="VIrZslOpK3xPOmjUwJWD-4" value="Log / Transaction Log" style="html=1;whiteSpace=wrap;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="180" y="290" width="110" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="VIrZslOpK3xPOmjUwJWD-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="VIrZslOpK3xPOmjUwJWD-6" target="VIrZslOpK3xPOmjUwJWD-16">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="115" y="505" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="VIrZslOpK3xPOmjUwJWD-6" value="With(Transaction)&lt;div&gt;LoggerLevel&lt;div&gt;&amp;lt;&amp;lt;driver&amp;gt;&amp;gt;&lt;/div&gt;&lt;/div&gt;" style="html=1;whiteSpace=wrap;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="390" width="110" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="VIrZslOpK3xPOmjUwJWD-18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="VIrZslOpK3xPOmjUwJWD-11" target="VIrZslOpK3xPOmjUwJWD-16">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="355" y="505" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="VIrZslOpK3xPOmjUwJWD-23" value="Form instance&amp;nbsp;&lt;div&gt;(high priority)&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="VIrZslOpK3xPOmjUwJWD-18">
+          <mxGeometry x="-0.6242" y="-2" relative="1" as="geometry">
+            <mxPoint x="2" y="6" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="VIrZslOpK3xPOmjUwJWD-11" value="With(Transaction)&lt;div&gt;OutputWriter&lt;div&gt;&amp;lt;&amp;lt;driver&amp;gt;&amp;gt;&lt;/div&gt;&lt;/div&gt;" style="html=1;whiteSpace=wrap;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="300" y="390" width="110" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="VIrZslOpK3xPOmjUwJWD-28" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="VIrZslOpK3xPOmjUwJWD-16" target="VIrZslOpK3xPOmjUwJWD-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="VIrZslOpK3xPOmjUwJWD-16" value="Log / Transaction Log Instance" style="html=1;whiteSpace=wrap;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="180" y="480" width="110" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="VIrZslOpK3xPOmjUwJWD-21" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;dashPattern=8 8;" edge="1" parent="1" source="VIrZslOpK3xPOmjUwJWD-20" target="VIrZslOpK3xPOmjUwJWD-16">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="VIrZslOpK3xPOmjUwJWD-22" value="Form instance&amp;nbsp;&lt;div&gt;(low priority)&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="VIrZslOpK3xPOmjUwJWD-21">
+          <mxGeometry x="-0.2288" y="1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="VIrZslOpK3xPOmjUwJWD-20" value="Defined YAML Config" style="html=1;whiteSpace=wrap;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="180" y="370" width="110" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="VIrZslOpK3xPOmjUwJWD-24" value="Form instance&amp;nbsp;&lt;div&gt;(high priority)&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="115" y="470" as="geometry">
+            <mxPoint x="4" y="-1" as="offset" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

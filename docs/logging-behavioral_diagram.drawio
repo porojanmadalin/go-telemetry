@@ -1,0 +1,67 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0" version="24.8.6">
+  <diagram name="Page-1" id="ENlzrLuBZ3aqjaY-moA5">
+    <mxGraphModel dx="860" dy="691" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="eizkRKIXoeNiZLJDZBoQ-1" value="" style="ellipse;html=1;shape=startState;fillColor=#000000;strokeColor=#ff0000;" vertex="1" parent="1">
+          <mxGeometry x="220" y="200" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="eizkRKIXoeNiZLJDZBoQ-2" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;verticalAlign=bottom;endArrow=open;endSize=8;strokeColor=#ff0000;rounded=0;" edge="1" parent="1" source="eizkRKIXoeNiZLJDZBoQ-1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="235" y="290" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="eizkRKIXoeNiZLJDZBoQ-23" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="eizkRKIXoeNiZLJDZBoQ-21" target="eizkRKIXoeNiZLJDZBoQ-22">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eizkRKIXoeNiZLJDZBoQ-28" value="Log Data" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="eizkRKIXoeNiZLJDZBoQ-23">
+          <mxGeometry x="-0.2909" y="-1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="eizkRKIXoeNiZLJDZBoQ-21" value="Log Instance" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="175" y="290" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="eizkRKIXoeNiZLJDZBoQ-34" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="eizkRKIXoeNiZLJDZBoQ-22" target="eizkRKIXoeNiZLJDZBoQ-33">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eizkRKIXoeNiZLJDZBoQ-22" value="Info/Warning/&lt;div&gt;Error/Debug&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="175" y="410" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="eizkRKIXoeNiZLJDZBoQ-32" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="eizkRKIXoeNiZLJDZBoQ-29" target="eizkRKIXoeNiZLJDZBoQ-31">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eizkRKIXoeNiZLJDZBoQ-29" value="Output&lt;div&gt;(CLI/JSON file/Text file)&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="550" y="410" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="eizkRKIXoeNiZLJDZBoQ-31" value="" style="ellipse;html=1;shape=endState;fillColor=#000000;strokeColor=#ff0000;" vertex="1" parent="1">
+          <mxGeometry x="595" y="280" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="eizkRKIXoeNiZLJDZBoQ-35" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="eizkRKIXoeNiZLJDZBoQ-33" target="eizkRKIXoeNiZLJDZBoQ-29">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eizkRKIXoeNiZLJDZBoQ-38" value="yes" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="eizkRKIXoeNiZLJDZBoQ-35">
+          <mxGeometry x="-0.5035" y="2" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="eizkRKIXoeNiZLJDZBoQ-36" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="eizkRKIXoeNiZLJDZBoQ-33" target="eizkRKIXoeNiZLJDZBoQ-31">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="420" y="295" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="eizkRKIXoeNiZLJDZBoQ-37" value="no" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="eizkRKIXoeNiZLJDZBoQ-36">
+          <mxGeometry x="-0.7786" y="2" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="eizkRKIXoeNiZLJDZBoQ-33" value="Log Level&amp;nbsp;&lt;div&gt;Sattisfied?&lt;/div&gt;" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="380" y="405" width="80" height="70" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
