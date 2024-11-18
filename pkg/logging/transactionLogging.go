@@ -7,6 +7,10 @@ import (
 	"time"
 )
 
+const (
+	waitDurationUntilTransactionStop = 2 * time.Second
+)
+
 type TransactionLoggerData struct {
 	LoggerLevel     loggerLevel   `json:"loggerLevel"`
 	TransactionLogs []*LoggerData `json:"transactionLogs"`
@@ -36,7 +40,6 @@ func NewTransactionLog(transactionId string, options ...func(*transactionLogging
 		config.Init()
 
 		availableTransactions = &transactionMap{}
-
 	})
 
 	transactionLoggerInstance = &transactionLogging{}
@@ -155,8 +158,8 @@ func (l *transactionLogging) StopTransactionLogging() error {
 	}
 	endTimestamp := time.Now()
 
-	fmt.Printf("info: Will end logging transaction in 5 seconds %s\n", l.transactionId)
-	time.Sleep(5 * time.Second)
+	fmt.Printf("info: Will end logging transaction in a couple of seconds %s\n", l.transactionId)
+	time.Sleep(waitDurationUntilTransactionStop)
 
 	foundTransaction, loaded := availableTransactions.LoadAndDelete(l.transactionId)
 	if !loaded {
@@ -171,13 +174,14 @@ func (l *transactionLogging) StopTransactionLogging() error {
 	// found transaction should not contain logs that do not sattisfy the log level set prior
 
 	writeTransactionLogOutputMutex.Lock()
-	defer writeTransactionLogOutputMutex.Unlock()
 
 	err := l.outputWrite(l.transactionId, l.startTimestamp, endTimestamp, foundTransactionTyped)
 	if err != nil {
 		fmt.Println(err)
+		writeTransactionLogOutputMutex.Unlock()
 		return err
 	}
 
+	writeTransactionLogOutputMutex.Unlock()
 	return nil
 }

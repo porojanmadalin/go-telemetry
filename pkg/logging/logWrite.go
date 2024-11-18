@@ -3,8 +3,10 @@ package logging
 import (
 	"encoding/json"
 	"fmt"
+	"go-telemetry/pkg/internal/config"
 	"io"
 	"os"
+	"path/filepath"
 	"reflect"
 	"strings"
 	"time"
@@ -14,7 +16,7 @@ type LogOutputWriter func(*LoggerData) error
 
 func CLILogOutputWrite() LogOutputWriter {
 	return func(loggerData *LoggerData) error {
-		fmt.Printf("[%s] [%s] %s", loggerData.Timestamp.Format("2006-01-02 15:04:05.0000"), loggerData.LoggerLevel, loggerData.Message)
+		fmt.Printf("[%s] [%s] %s", loggerData.Timestamp.Format(timestampFormat), loggerData.LoggerLevel, loggerData.Message)
 		for k, v := range loggerData.MetaData {
 			typeName := reflect.TypeOf(v).Name()
 			if strings.Contains(typeName, "int") {
@@ -35,7 +37,7 @@ func CLILogOutputWrite() LogOutputWriter {
 
 func JSONLogOutputFileWrite() LogOutputWriter {
 	return func(loggerData *LoggerData) error {
-		fileName := fmt.Sprintf("%s.json", time.Now().Format("2006-01-02"))
+		fileName := fmt.Sprintf(filepath.Join(config.LoggerConfig.Logger.OutputDir, "%s.json"), time.Now().Format(fileTimestampFormat))
 		f, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE, 0644)
 		if err != nil {
 			return fmt.Errorf("error: could not open json file %v", err)
@@ -78,14 +80,14 @@ func JSONLogOutputFileWrite() LogOutputWriter {
 
 func TextLogOutputFileWrite() LogOutputWriter {
 	return func(loggerData *LoggerData) error {
-		fileName := fmt.Sprintf("%s.log", time.Now().Format("2006-01-02"))
+		fileName := fmt.Sprintf(filepath.Join(config.LoggerConfig.Logger.OutputDir, "%s.log"), time.Now().Format(fileTimestampFormat))
 		f, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 		if err != nil {
 			return fmt.Errorf("error: could not open text file %v", err)
 		}
 		defer f.Close()
 
-		f.WriteString(fmt.Sprintf("[%s] [%s] %s", loggerData.Timestamp.Format("2006-01-02 15:04:05.0000"), loggerData.LoggerLevel, loggerData.Message))
+		f.WriteString(fmt.Sprintf("[%s] [%s] %s", loggerData.Timestamp.Format(timestampFormat), loggerData.LoggerLevel, loggerData.Message))
 		for k, v := range loggerData.MetaData {
 			typeName := reflect.TypeOf(v).Name()
 			if strings.Contains(typeName, "int") {

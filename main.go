@@ -8,29 +8,33 @@ import (
 
 func main() {
 
-	// log := logging.NewLog()
+	// Examples
 
-	// log.Debug("Hello", map[string]any{
-	// 	"VarInt":  1,
-	// 	"VarStr":  "Test",
-	// 	"VarTest": 3.14,
-	// })
-	// log.Warning("Hello", map[string]any{
-	// 	"VarInt":  1,
-	// 	"VarStr":  "Test",
-	// 	"VarTest": 3.14,
-	// })
-	// log.Info("Hello", map[string]any{
-	// 	"VarInt":  1,
-	// 	"VarStr":  "Test",
-	// 	"VarTest": 3.14,
-	// })
-	// log.Error("Hello", map[string]any{
-	// 	"VarInt":  1,
-	// 	"VarStr":  "Test",
-	// 	"VarTest": 3.14,
-	// })
+	//! #1 Logging example
+	log := logging.NewLog()
 
+	log.Debug("Hello", map[string]any{
+		"VarInt":  1,
+		"VarStr":  "Test",
+		"VarTest": 3.14,
+	})
+	log.Warning("Hello", map[string]any{
+		"VarInt":  1,
+		"VarStr":  "Test",
+		"VarTest": 3.14,
+	})
+	log.Info("Hello", map[string]any{
+		"VarInt":  1,
+		"VarStr":  "Test",
+		"VarTest": 3.14,
+	})
+	log.Error("Hello", map[string]any{
+		"VarInt":  1,
+		"VarStr":  "Test",
+		"VarTest": 3.14,
+	})
+
+	//! #2 Transaction Logging Example
 	var waitGroup sync.WaitGroup
 	waitGroup.Add(3)
 

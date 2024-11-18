@@ -3,8 +3,10 @@ package logging
 import (
 	"encoding/json"
 	"fmt"
+	"go-telemetry/pkg/internal/config"
 	"io"
 	"os"
+	"path/filepath"
 	"reflect"
 	"strings"
 	"time"
@@ -14,10 +16,10 @@ type TransactionLogOutputWriter func(transactionId string, startTimestamp time.T
 
 func CLITransactionLogOutputWrite() TransactionLogOutputWriter {
 	return func(transactionId string, startTimestamp time.Time, endTimestamp time.Time, transactionLoggerData *TransactionLoggerData) error {
-		fmt.Printf("[%s] Transaction {%s} started!\n", startTimestamp.Format("2006-01-02 15:04:05.0000"), transactionId)
+		fmt.Printf("[%s] Transaction {%s} started!\n", startTimestamp.Format(timestampFormat), transactionId)
 
 		for _, entry := range transactionLoggerData.TransactionLogs {
-			fmt.Printf("--> [%s] [%s] %s", entry.Timestamp.Format("2006-01-02 15:04:05.0000"), entry.LoggerLevel, entry.Message)
+			fmt.Printf("--> [%s] [%s] %s", entry.Timestamp.Format(timestampFormat), entry.LoggerLevel, entry.Message)
 			for k, v := range entry.MetaData {
 				typeName := reflect.TypeOf(v).Name()
 				if strings.Contains(typeName, "int") {
@@ -34,14 +36,14 @@ func CLITransactionLogOutputWrite() TransactionLogOutputWriter {
 			fmt.Printf("\n")
 		}
 
-		fmt.Printf("[%s] Transaction {%s} ended!\n", endTimestamp.Format("2006-01-02 15:04:05.0000"), transactionId)
+		fmt.Printf("[%s] Transaction {%s} ended!\n", endTimestamp.Format(timestampFormat), transactionId)
 		return nil
 	}
 }
 
 func JSONTransactionLogOutputFileWrite() TransactionLogOutputWriter {
 	return func(transactionId string, startTimestamp time.Time, endTimestamp time.Time, transactionLoggerData *TransactionLoggerData) error {
-		fileName := fmt.Sprintf("%s.json", time.Now().Format("2006-01-02"))
+		fileName := fmt.Sprintf(filepath.Join(config.LoggerConfig.Logger.OutputDir, "%s_transactions.json"), time.Now().Format(fileTimestampFormat))
 		f, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE, 0644)
 		if err != nil {
 			return fmt.Errorf("error: could not open json file %v", err)
@@ -61,7 +63,7 @@ func JSONTransactionLogOutputFileWrite() TransactionLogOutputWriter {
 			TransactionID   string                 `json:"transactionId"`
 			StartTimestamp  time.Time              `json:"startTimestamp"`
 			EndTimestamp    time.Time              `json:"endTimestamp"`
-			TransactionLogs *TransactionLoggerData `json:"transactionLogs"`
+			TransactionLogs *TransactionLoggerData `json:"transactionData"`
 		}
 		outputJSON := &OutputJSON{
 			TransactionID:   transactionId,
@@ -97,17 +99,17 @@ func JSONTransactionLogOutputFileWrite() TransactionLogOutputWriter {
 
 func TextTransactionLogOutputFileWrite() TransactionLogOutputWriter {
 	return func(transactionId string, startTimestamp time.Time, endTimestamp time.Time, transactionLoggerData *TransactionLoggerData) error {
-		fileName := fmt.Sprintf("%s.log", time.Now().Format("2006-01-02"))
+		fileName := fmt.Sprintf(filepath.Join(config.LoggerConfig.Logger.OutputDir, "%s_transactions.json"), time.Now().Format(fileTimestampFormat))
 		f, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 		if err != nil {
 			return fmt.Errorf("error: could not open text file %v", err)
 		}
 		defer f.Close()
 
-		f.WriteString(fmt.Sprintf("[%s] Transaction {%s} started!\n", startTimestamp.Format("2006-01-02 15:04:05.0000"), transactionId))
+		f.WriteString(fmt.Sprintf("[%s] Transaction {%s} started!\n", startTimestamp.Format(timestampFormat), transactionId))
 
 		for _, entry := range transactionLoggerData.TransactionLogs {
-			f.WriteString(fmt.Sprintf("--> [%s] [%s] %s", entry.Timestamp.Format("2006-01-02 15:04:05.0000"), entry.LoggerLevel, entry.Message))
+			f.WriteString(fmt.Sprintf("--> [%s] [%s] %s", entry.Timestamp.Format(timestampFormat), entry.LoggerLevel, entry.Message))
 			for k, v := range entry.MetaData {
 				typeName := reflect.TypeOf(v).Name()
 				if strings.Contains(typeName, "int") {
@@ -124,7 +126,7 @@ func TextTransactionLogOutputFileWrite() TransactionLogOutputWriter {
 			f.WriteString("\n")
 		}
 
-		f.WriteString(fmt.Sprintf("[%s] Transaction {%s} ended!\n", endTimestamp.Format("2006-01-02 15:04:05.0000"), transactionId))
+		f.WriteString(fmt.Sprintf("[%s] Transaction {%s} ended!\n", endTimestamp.Format(timestampFormat), transactionId))
 		return nil
 	}
 }

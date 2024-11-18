@@ -35,7 +35,7 @@ func NewLog(options ...func(*logging)) *logging {
 		case string(LevelOff), string(LevelInfo), string(LevelWarning), string(LevelError), string(LevelDebug):
 			loggerInstance.loggerLevel = loggerLevel(config.LoggerConfig.Logger.Level)
 		default:
-			loggerInstance.loggerLevel = LevelOff
+			loggerInstance.loggerLevel = LevelInfo
 		}
 
 		switch config.LoggerConfig.Logger.OutputWriter {
