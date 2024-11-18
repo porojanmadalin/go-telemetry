@@ -15,10 +15,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const transactionLogTestDirName = "testtransactionlog"
-
-var testEndTimestamp = now.Add(1 * time.Second)
-var testTransactionId = "testTransaction"
 var testTransactionLogging = TransactionLoggerData{
 	LoggerLevel: LevelError,
 	TransactionLogs: []*LoggerData{

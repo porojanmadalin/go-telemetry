@@ -1,7 +1,6 @@
 package logging
 
 import (
-	"fmt"
 	"go-telemetry/pkg/internal/config"
 	itesting "go-telemetry/pkg/internal/telemetrytesting"
 	"sync"
@@ -100,9 +99,8 @@ func TestNewLogWithYAMLConfig(t *testing.T) {
 		},
 	}
 
-	// config.Init()
 	config.LoggerConfig = &config.Config{}
-	for idx, test := range testCases {
+	for _, test := range testCases {
 		loggerOnce = sync.Once{}
 		config.LoggerConfig.Logger = test.Data
 		log := NewLog()
@@ -111,7 +109,7 @@ func TestNewLogWithYAMLConfig(t *testing.T) {
 		if err != nil {
 			t.FailNow()
 		}
-		assert.Contains(t, fnName, test.Expected.OutputWriterName, fmt.Sprintf("Test #%d: [level=%s] [outputWriter=%s]\n", idx+1, test.Data.Level, test.Data.OutputWriter))
+		assert.Contains(t, fnName, test.Expected.OutputWriterName)
 	}
 }
 
@@ -129,7 +127,7 @@ func TestWithLogOutputWriter(t *testing.T) {
 	if err != nil {
 		t.FailNow()
 	}
-	assert.Contains(t, fnName, "CLILogOutputWrite")
+	assert.Contains(t, fnName, CLILogOutputWriteName)
 }
 
 func TestLoggingOff(t *testing.T) {
