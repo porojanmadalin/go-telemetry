@@ -1,4 +1,4 @@
-package abcd
+package telemetrytesting
 
 import (
 	"fmt"

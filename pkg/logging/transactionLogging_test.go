@@ -339,3 +339,11 @@ func TestTransactionDebug(t *testing.T) {
 	assert.Contains(t, bytes, "test error")
 	assert.Contains(t, bytes, "test debug")
 }
+
+func TestStartTransactionLogging(t *testing.T) {
+
+}
+
+func StopTransactionLogging(t *testing.T) {
+
+}
