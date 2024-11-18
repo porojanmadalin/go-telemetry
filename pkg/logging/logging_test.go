@@ -16,18 +16,20 @@ const (
 	TextLogOutputFileWriteName = "TextLogOutputFileWrite"
 )
 
-func TestNewLogWithYAMLConfig(t *testing.T) {
+func TestNewLogWithYAMLConfigTableDriven(t *testing.T) {
 	type Expected struct {
 		Level            loggerLevel
 		OutputWriterName string
 	}
 	type TestCase struct {
+		TestName string
 		Data     config.Logger
 		Expected Expected
 	}
 
 	testCases := []TestCase{
 		{
+			TestName: "Config contains invalid values",
 			Data: config.Logger{
 				Level:        "undefined",
 				OutputWriter: "undefined",
@@ -38,6 +40,7 @@ func TestNewLogWithYAMLConfig(t *testing.T) {
 			},
 		},
 		{
+			TestName: "Unset Config",
 			Data: config.Logger{
 				Level:        "",
 				OutputWriter: "",
@@ -48,6 +51,7 @@ func TestNewLogWithYAMLConfig(t *testing.T) {
 			},
 		},
 		{
+			TestName: "Log level off, output writer cli",
 			Data: config.Logger{
 				Level:        string(LevelOff),
 				OutputWriter: string(cli),
@@ -58,6 +62,7 @@ func TestNewLogWithYAMLConfig(t *testing.T) {
 			},
 		},
 		{
+			TestName: "Log level info, output writer json file",
 			Data: config.Logger{
 				Level:        string(LevelInfo),
 				OutputWriter: string(jsonFile),
@@ -68,6 +73,7 @@ func TestNewLogWithYAMLConfig(t *testing.T) {
 			},
 		},
 		{
+			TestName: "Log level warning, output writer text file",
 			Data: config.Logger{
 				Level:        string(LevelWarning),
 				OutputWriter: string(textFile),
@@ -78,6 +84,7 @@ func TestNewLogWithYAMLConfig(t *testing.T) {
 			},
 		},
 		{
+			TestName: "Log level error, output writer invalid value",
 			Data: config.Logger{
 				Level:        string(LevelError),
 				OutputWriter: "undefined",
@@ -88,6 +95,7 @@ func TestNewLogWithYAMLConfig(t *testing.T) {
 			},
 		},
 		{
+			TestName: "Log level debug, output writer invalid value",
 			Data: config.Logger{
 				Level:        string(LevelDebug),
 				OutputWriter: "undefined",
@@ -101,15 +109,17 @@ func TestNewLogWithYAMLConfig(t *testing.T) {
 
 	config.LoggerConfig = &config.Config{}
 	for _, test := range testCases {
-		loggerOnce = sync.Once{}
-		config.LoggerConfig.Logger = test.Data
-		log := NewLog()
-		assert.Equal(t, test.Expected.Level, log.loggerLevel)
-		fnName, err := itesting.GetFunctionName(log.outputWrite)
-		if err != nil {
-			t.Fatalf("fatal: could not locate the function %v", err)
-		}
-		assert.Contains(t, fnName, test.Expected.OutputWriterName)
+		t.Run(test.TestName, func(t *testing.T) {
+			loggerOnce = sync.Once{}
+			config.LoggerConfig.Logger = test.Data
+			log := NewLog()
+			assert.Equal(t, test.Expected.Level, log.loggerLevel)
+			fnName, err := itesting.GetFunctionName(log.outputWrite)
+			if err != nil {
+				t.Fatalf("fatal: could not locate the function %v", err)
+			}
+			assert.Contains(t, fnName, test.Expected.OutputWriterName)
+		})
 	}
 }
 

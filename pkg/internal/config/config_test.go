@@ -55,13 +55,16 @@ func cleanup(t *testing.T) {
 	}
 }
 
-func TestInit(t *testing.T) {
+func TestInitWithNoConfigSet(t *testing.T) {
 	configOnce = sync.Once{}
 	Init()
 
 	assert.Equal(t, "", LoggerConfig.Logger.Level)
 	assert.Equal(t, "", LoggerConfig.Logger.OutputWriter)
 
+}
+
+func TestInit(t *testing.T) {
 	configOnce = sync.Once{}
 	setupConfigFile(t, "info", "cli")
 	Init()

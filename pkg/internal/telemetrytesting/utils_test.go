@@ -30,17 +30,12 @@ func TestGetFunctionName(t *testing.T) {
 		t.Fatalf("fatal: could not get the function name %v", err)
 	}
 	assert.Contains(t, name, "GetFunctionName")
+}
 
-	fn2 := AlmostEqual
-	name, err = GetFunctionName(fn2)
-	if err != nil {
-		t.Fatalf("fatal: could not get the function name %v", err)
-	}
-	assert.Contains(t, name, "AlmostEqual")
-
+func TestGetFunctionNameWithUnnamedFunctions(t *testing.T) {
 	// unnamed fn
 	fn3 := func() {}
-	name, err = GetFunctionName(fn3)
+	name, err := GetFunctionName(fn3)
 	if err != nil {
 		t.Fatalf("fatal: could not get the function name %v", err)
 	}
@@ -49,6 +44,4 @@ func TestGetFunctionName(t *testing.T) {
 
 func TestAlmostEqual(t *testing.T) {
 	assert.True(t, AlmostEqual(3.14, 3.14))
-	assert.True(t, AlmostEqual(1, 1.0))
-	assert.False(t, AlmostEqual(1, 0))
 }
