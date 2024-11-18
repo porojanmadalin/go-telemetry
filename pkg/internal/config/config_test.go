@@ -55,8 +55,6 @@ func cleanup(t *testing.T) {
 	}
 }
 
-// assert.Contains(t, os.Getenv("GO_TELEMETRY_FILE_PATH"), defaultConfigFileName)
-
 func TestInit(t *testing.T) {
 	configOnce = sync.Once{}
 	Init()

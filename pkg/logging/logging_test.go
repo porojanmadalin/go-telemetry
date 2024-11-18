@@ -34,7 +34,7 @@ func TestNewLogWithYAMLConfig(t *testing.T) {
 				OutputWriter: "undefined",
 			},
 			Expected: Expected{
-				Level:            LevelOff,
+				Level:            LevelInfo,
 				OutputWriterName: CLILogOutputWriteName,
 			},
 		},
@@ -44,7 +44,7 @@ func TestNewLogWithYAMLConfig(t *testing.T) {
 				OutputWriter: "",
 			},
 			Expected: Expected{
-				Level:            LevelOff,
+				Level:            LevelInfo,
 				OutputWriterName: CLILogOutputWriteName,
 			},
 		},

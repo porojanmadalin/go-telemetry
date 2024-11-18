@@ -49,6 +49,6 @@ func convertLoggerLevelToInt(loggerLevel loggerLevel) int {
 	case LevelDebug:
 		return levelDebugInt
 	default:
-		return levelOffInt
+		return levelInfoInt
 	}
 }
