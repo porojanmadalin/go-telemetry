@@ -63,7 +63,7 @@ func JSONTransactionLogOutputFileWrite() TransactionLogOutputWriter {
 			TransactionID   string                 `json:"transactionId"`
 			StartTimestamp  time.Time              `json:"startTimestamp"`
 			EndTimestamp    time.Time              `json:"endTimestamp"`
-			TransactionLogs *TransactionLoggerData `json:"transactionLogs"`
+			TransactionLogs *TransactionLoggerData `json:"transactionData"`
 		}
 		outputJSON := &OutputJSON{
 			TransactionID:   transactionId,

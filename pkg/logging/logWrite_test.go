@@ -16,24 +16,24 @@ import (
 
 const logTestDirName = "testlog"
 
+var now = time.Now()
+var testLogging = LoggerData{
+	LoggerLevel: LevelInfo,
+	Timestamp:   now,
+	Message:     "test",
+	MetaData: map[string]any{
+		"varInt":   0,
+		"varStr":   "string",
+		"varFloat": 3.14,
+	},
+}
+
 func logFormat(loggerData LoggerData) string {
 	return fmt.Sprintf("[%s] [%s] %s", loggerData.Timestamp.Format(timestampFormat), loggerData.LoggerLevel, loggerData.Message)
 }
 
 func TestCLILogOutputWrite(t *testing.T) {
 	setupTestEnvironment(t, logTestDirName)
-
-	now := time.Now()
-	testLogging := LoggerData{
-		LoggerLevel: LevelInfo,
-		Timestamp:   now,
-		Message:     "test",
-		MetaData: map[string]any{
-			"varInt":   0,
-			"varStr":   "string",
-			"varFloat": 3.14,
-		},
-	}
 
 	output, err := itesting.CaptureOutput(func() error {
 		err := CLILogOutputWrite()(&testLogging)
@@ -44,31 +44,19 @@ func TestCLILogOutputWrite(t *testing.T) {
 	}
 
 	assert.Contains(t, output, logFormat(testLogging))
-	assert.Contains(t, output, "varInt=0")
-	assert.Contains(t, output, "varStr=string")
-	assert.Contains(t, output, "varFloat=3.14")
+	assert.Contains(t, output, fmt.Sprintf("varInt=%d", testLogging.MetaData["varInt"]))
+	assert.Contains(t, output, fmt.Sprintf("varStr=%s", testLogging.MetaData["varStr"]))
+	assert.Contains(t, output, fmt.Sprintf("varFloat=%f", testLogging.MetaData["varFloat"]))
 	assert.Contains(t, output, "\n")
 }
 
 func TestJSONLogOutputFileWrite(t *testing.T) {
 	setupTestEnvironment(t, logTestDirName)
 
-	now := time.Now()
 	generatedFileName := fmt.Sprintf("%s.json", now.Format(fileTimestampFormat))
 	t.Cleanup(func() {
 		cleanup(t, []string{generatedFileName})
 	})
-
-	testLogging := LoggerData{
-		LoggerLevel: LevelInfo,
-		Timestamp:   now,
-		Message:     "test",
-		MetaData: map[string]any{
-			"varInt":   0,
-			"varStr":   "string",
-			"varFloat": 3.14,
-		},
-	}
 
 	err := JSONLogOutputFileWrite()(&testLogging)
 	if err != nil {
@@ -99,22 +87,10 @@ func TestJSONLogOutputFileWrite(t *testing.T) {
 func TestTextLogOutputFileWrite(t *testing.T) {
 	setupTestEnvironment(t, logTestDirName)
 
-	now := time.Now()
 	generatedFileName := fmt.Sprintf("%s.log", now.Format(fileTimestampFormat))
 	t.Cleanup(func() {
 		cleanup(t, []string{generatedFileName})
 	})
-
-	testLogging := LoggerData{
-		LoggerLevel: LevelInfo,
-		Timestamp:   now,
-		Message:     "test",
-		MetaData: map[string]any{
-			"varInt":   0,
-			"varStr":   "string",
-			"varFloat": 3.14,
-		},
-	}
 
 	err := TextLogOutputFileWrite()(&testLogging)
 	if err != nil {
@@ -135,8 +111,8 @@ func TestTextLogOutputFileWrite(t *testing.T) {
 	output := string(b[:])
 
 	assert.Contains(t, output, logFormat(testLogging))
-	assert.Contains(t, output, "varInt=0")
-	assert.Contains(t, output, "varStr=string")
-	assert.Contains(t, output, "varFloat=3.14")
+	assert.Contains(t, output, fmt.Sprintf("varInt=%d", testLogging.MetaData["varInt"]))
+	assert.Contains(t, output, fmt.Sprintf("varStr=%s", testLogging.MetaData["varStr"]))
+	assert.Contains(t, output, fmt.Sprintf("varFloat=%f", testLogging.MetaData["varFloat"]))
 	assert.Contains(t, output, "\n")
 }
