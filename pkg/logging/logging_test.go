@@ -3,6 +3,7 @@ package logging
 import (
 	"fmt"
 	"go-telemetry/pkg/internal/config"
+	itesting "go-telemetry/pkg/internal/telemetrytesting"
 	"sync"
 	"testing"
 
@@ -105,8 +106,8 @@ func TestNewLogWithYAMLConfig(t *testing.T) {
 		loggerOnce = sync.Once{}
 		config.LoggerConfig.Logger = test.Data
 		log := NewLog()
-		assert.Equal(t, log.loggerLevel, test.Expected.Level)
-		fnName, err := getFunctionName(log.outputWrite)
+		assert.Equal(t, test.Expected.Level, log.loggerLevel)
+		fnName, err := itesting.GetFunctionName(log.outputWrite)
 		if err != nil {
 			t.FailNow()
 		}
@@ -117,14 +118,14 @@ func TestNewLogWithYAMLConfig(t *testing.T) {
 func TestWithLoggerLevel(t *testing.T) {
 	l := logging{}
 	WithLoggerLevel(LevelDebug)(&l)
-	assert.Equal(t, l.loggerLevel, LevelDebug)
+	assert.Equal(t, LevelDebug, l.loggerLevel)
 }
 
 func TestWithLogOutputWriter(t *testing.T) {
 	CLI := CLILogOutputWrite()
 	l := logging{}
 	WithLogOutputWriter(CLI)(&l)
-	fnName, err := getFunctionName(l.outputWrite)
+	fnName, err := itesting.GetFunctionName(l.outputWrite)
 	if err != nil {
 		t.FailNow()
 	}
@@ -135,7 +136,7 @@ func TestLoggingOff(t *testing.T) {
 	loggerOnce = sync.Once{}
 	log := NewLog(WithLoggerLevel(LevelOff))
 
-	bytes, err := captureOutput(func() error {
+	bytes, err := itesting.CaptureOutput(func() error {
 		log.Info("test info", nil)
 		log.Warning("test warning", nil)
 		log.Error("test error", nil)
@@ -154,7 +155,7 @@ func TestInfo(t *testing.T) {
 	loggerOnce = sync.Once{}
 	log := NewLog(WithLoggerLevel(LevelInfo))
 
-	bytes, err := captureOutput(func() error {
+	bytes, err := itesting.CaptureOutput(func() error {
 		log.Info("test info", map[string]any{
 			"varInt":   0,
 			"varStr":   "string",
@@ -183,7 +184,7 @@ func TestWarning(t *testing.T) {
 	loggerOnce = sync.Once{}
 	log := NewLog(WithLoggerLevel(LevelWarning))
 
-	bytes, err := captureOutput(func() error {
+	bytes, err := itesting.CaptureOutput(func() error {
 		log.Warning("test warning", map[string]any{
 			"varInt":   0,
 			"varStr":   "string",
@@ -212,7 +213,7 @@ func TestError(t *testing.T) {
 	loggerOnce = sync.Once{}
 	log := NewLog(WithLoggerLevel(LevelError))
 
-	bytes, err := captureOutput(func() error {
+	bytes, err := itesting.CaptureOutput(func() error {
 		log.Error("test error", map[string]any{
 			"varInt":   0,
 			"varStr":   "string",
@@ -241,7 +242,7 @@ func TestDebug(t *testing.T) {
 	loggerOnce = sync.Once{}
 	log := NewLog(WithLoggerLevel(LevelDebug))
 
-	bytes, err := captureOutput(func() error {
+	bytes, err := itesting.CaptureOutput(func() error {
 		log.Debug("test debug", map[string]any{
 			"varInt":   0,
 			"varStr":   "string",

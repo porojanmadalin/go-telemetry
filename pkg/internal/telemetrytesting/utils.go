@@ -1,4 +1,4 @@
-package logging
+package abcd
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"runtime"
 )
 
-func captureOutput(f func() error) (string, error) {
+func CaptureOutput(f func() error) (string, error) {
 	orig := os.Stdout
 	r, w, _ := os.Pipe()
 	os.Stdout = w
@@ -19,7 +19,7 @@ func captureOutput(f func() error) (string, error) {
 	return string(out), err
 }
 
-func getFunctionName(function interface{}) (string, error) {
+func GetFunctionName(function interface{}) (string, error) {
 	pc := reflect.ValueOf(function).Pointer()
 	fn := runtime.FuncForPC(pc)
 	if fn != nil {
