@@ -40,7 +40,6 @@ func NewTransactionLog(transactionId string, options ...func(*transactionLogging
 		config.Init()
 
 		availableTransactions = &transactionMap{}
-
 	})
 
 	transactionLoggerInstance = &transactionLogging{}
@@ -175,13 +174,14 @@ func (l *transactionLogging) StopTransactionLogging() error {
 	// found transaction should not contain logs that do not sattisfy the log level set prior
 
 	writeTransactionLogOutputMutex.Lock()
-	defer writeTransactionLogOutputMutex.Unlock()
 
 	err := l.outputWrite(l.transactionId, l.startTimestamp, endTimestamp, foundTransactionTyped)
 	if err != nil {
 		fmt.Println(err)
+		writeTransactionLogOutputMutex.Unlock()
 		return err
 	}
 
+	writeTransactionLogOutputMutex.Unlock()
 	return nil
 }

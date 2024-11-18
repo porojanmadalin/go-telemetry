@@ -1,6 +1,7 @@
 package logging
 
 import (
+	"fmt"
 	"go-telemetry/pkg/internal/config"
 	itesting "go-telemetry/pkg/internal/telemetrytesting"
 	"sync"
@@ -113,11 +114,14 @@ func TestNewTransactionLogWithYAMLConfigTableDriven(t *testing.T) {
 		},
 	}
 
-	config.LoggerConfig = &config.Config{}
 	for _, test := range testCases {
 		t.Run(test.TestName, func(t *testing.T) {
 			transactionLoggerOnce = sync.Once{}
 			config.LoggerConfig.Logger = test.Data
+			t.Cleanup(func() {
+				config.LoggerConfig = &config.Config{}
+			})
+
 			log, err := NewTransactionLog(testTransactionId)
 			if err != nil {
 				t.Fatalf("fatal: transaction log could not be initialized for transaction %s %v", testTransactionId, err)
@@ -130,6 +134,27 @@ func TestNewTransactionLogWithYAMLConfigTableDriven(t *testing.T) {
 			assert.Contains(t, fnName, test.Expected.OutputWriterName)
 		})
 	}
+}
+
+func TestNewTransactionLogWhenTransactionExists(t *testing.T) {
+	log1, err := NewTransactionLog(testTransactionId)
+	if err != nil {
+		t.Fatalf("fatal: transaction log could not be initialized for transaction %s %v", testTransactionId, err)
+	}
+	err = log1.StartTransactionLogging()
+	if err != nil {
+		t.Fatalf("fatal: transaction log could not be started for transaction %s %v", testTransactionId, err)
+	}
+	t.Cleanup(func() {
+		err := log1.StopTransactionLogging()
+		if err != nil {
+			t.Fatalf("fatal: transaction log could not be stopped for transaction %s %v", testTransactionId, err)
+		}
+	})
+
+	_, err = NewTransactionLog(testTransactionId)
+	assert.True(t, err != nil)
+	assert.Equal(t, fmt.Sprintf("error: the provided transaction was already started %s", testTransactionId), err.Error())
 }
 
 func TestWithTransactionLoggerLevel(t *testing.T) {
@@ -350,10 +375,138 @@ func TestTransactionDebug(t *testing.T) {
 	assert.Contains(t, bytes, "test debug")
 }
 
-func TestStartTransactionLogging(t *testing.T) {
+func TestStartTransactionLoggingWithLoggingOff(t *testing.T) {
+	transactionLoggerOnce = sync.Once{}
+	log, err := NewTransactionLog(testTransactionId, WithTransactionLoggerLevel(LevelOff))
+	if err != nil {
+		t.Fatalf("fatal: transaction log could not be initialized for transaction %s %v", testTransactionId, err)
+	}
 
+	err = log.StartTransactionLogging()
+	if err != nil {
+		t.Fatalf("fatal: transaction log could not be started for transaction %s %v", testTransactionId, err)
+	}
+	t.Cleanup(func() {
+		err := log.StopTransactionLogging()
+		if err != nil {
+			t.Fatalf("fatal: transaction log could not be stopped for transaction %s %v", testTransactionId, err)
+		}
+	})
+
+	_, found := availableTransactions.Load(testTransactionId)
+	assert.True(t, !found)
 }
 
-func StopTransactionLogging(t *testing.T) {
+func TestStartTransactionLogging(t *testing.T) {
+	transactionLoggerOnce = sync.Once{}
+	log, err := NewTransactionLog(testTransactionId)
+	if err != nil {
+		t.Fatalf("fatal: transaction log could not be initialized for transaction %s %v", testTransactionId, err)
+	}
 
+	err = log.StartTransactionLogging()
+	if err != nil {
+		t.Fatalf("fatal: transaction log could not be started for transaction %s %v", testTransactionId, err)
+	}
+	t.Cleanup(func() {
+		err := log.StopTransactionLogging()
+		if err != nil {
+			t.Fatalf("fatal: transaction log could not be stopped for transaction %s %v", testTransactionId, err)
+		}
+	})
+
+	value, found := availableTransactions.Load(testTransactionId)
+
+	castedVal, ok := value.(*TransactionLoggerData)
+	if !ok {
+		t.Fatalf("fatal: transaction log could not be casted to TransactionLoggerData type for transaction %s %v", testTransactionId, err)
+	}
+
+	assert.True(t, found)
+	assert.Equal(t, LevelInfo, castedVal.LoggerLevel)
+	assert.Empty(t, castedVal.TransactionLogs)
+}
+
+func TestStopTransactionLoggingWithLoggingOff(t *testing.T) {
+	transactionLoggerOnce = sync.Once{}
+	log, err := NewTransactionLog(testTransactionId, WithTransactionLoggerLevel(LevelOff))
+	if err != nil {
+		t.Fatalf("fatal: transaction log could not be initialized for transaction %s %v", testTransactionId, err)
+	}
+
+	err = log.StartTransactionLogging()
+	if err != nil {
+		t.Fatalf("fatal: transaction log could not be started for transaction %s %v", testTransactionId, err)
+	}
+	err = log.StopTransactionLogging()
+	if err != nil {
+		t.Fatalf("fatal: transaction log could not be stopped for transaction %s %v", testTransactionId, err)
+	}
+
+	_, found := availableTransactions.Load(testTransactionId)
+	assert.True(t, !found)
+}
+
+func TestStopTransactionLogging(t *testing.T) {
+	transactionLoggerOnce = sync.Once{}
+	log, err := NewTransactionLog(testTransactionId)
+	if err != nil {
+		t.Fatalf("fatal: transaction log could not be initialized for transaction %s %v", testTransactionId, err)
+	}
+
+	err = log.StartTransactionLogging()
+	if err != nil {
+		t.Fatalf("fatal: transaction log could not be started for transaction %s %v", testTransactionId, err)
+	}
+
+	err = log.StopTransactionLogging()
+	if err != nil {
+		t.Fatalf("fatal: transaction log could not be stopped for transaction %s %v", testTransactionId, err)
+	}
+
+	value, found := availableTransactions.Load(testTransactionId)
+	assert.False(t, found)
+	assert.Equal(t, nil, value)
+}
+
+func TestAddLogToTransaction(t *testing.T) {
+	transactionLoggerOnce = sync.Once{}
+	log, err := NewTransactionLog(testTransactionId)
+	if err != nil {
+		t.Fatalf("fatal: transaction log could not be initialized for transaction %s %v", testTransactionId, err)
+	}
+
+	err = log.StartTransactionLogging()
+	if err != nil {
+		t.Fatalf("fatal: transaction log could not be started for transaction %s %v", testTransactionId, err)
+	}
+	t.Cleanup(func() {
+		err := log.StopTransactionLogging()
+		if err != nil {
+			t.Fatalf("fatal: transaction log could not be stopped for transaction %s %v", testTransactionId, err)
+		}
+	})
+
+	insertedLog := LoggerData{
+		LoggerLevel: LevelInfo,
+		Timestamp:   now,
+		Message:     "test",
+		MetaData:    nil,
+	}
+
+	err = log.addLogToTransaction(&insertedLog)
+	if err != nil {
+		t.Fatalf("fatal: log could not be added to transaction %s %v", testTransactionId, err)
+	}
+
+	value, found := availableTransactions.Load(testTransactionId)
+
+	castedVal, ok := value.(*TransactionLoggerData)
+	if !ok {
+		t.Fatalf("fatal: transaction log could not be casted to TransactionLoggerData type for transaction %s %v", testTransactionId, err)
+	}
+
+	assert.True(t, found)
+	assert.Equal(t, LevelInfo, castedVal.LoggerLevel)
+	assert.Contains(t, castedVal.TransactionLogs, &insertedLog)
 }
