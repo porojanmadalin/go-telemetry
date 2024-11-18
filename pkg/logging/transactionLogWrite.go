@@ -12,8 +12,10 @@ import (
 	"time"
 )
 
+// A TransactionLogOutputWriter is a output writer function for transaction logging.
 type TransactionLogOutputWriter func(transactionId string, startTimestamp time.Time, endTimestamp time.Time, transactionLoggerData *TransactionLoggerData) error
 
+// CLITransactionLogOutputWrite returns an output writer that prints the transaction log to the CLI.
 func CLITransactionLogOutputWrite() TransactionLogOutputWriter {
 	return func(transactionId string, startTimestamp time.Time, endTimestamp time.Time, transactionLoggerData *TransactionLoggerData) error {
 		fmt.Printf("[%s] Transaction {%s} started!\n", startTimestamp.Format(timestampFormat), transactionId)
@@ -41,6 +43,7 @@ func CLITransactionLogOutputWrite() TransactionLogOutputWriter {
 	}
 }
 
+// JSONTransactionLogOutputFileWrite returns an output writer that prints the transaction log to a JSON file.
 func JSONTransactionLogOutputFileWrite() TransactionLogOutputWriter {
 	return func(transactionId string, startTimestamp time.Time, endTimestamp time.Time, transactionLoggerData *TransactionLoggerData) error {
 		fileName := fmt.Sprintf(filepath.Join(config.LoggerConfig.Logger.OutputDir, "%s_transactions.json"), time.Now().Format(fileTimestampFormat))
@@ -97,6 +100,7 @@ func JSONTransactionLogOutputFileWrite() TransactionLogOutputWriter {
 	}
 }
 
+// TextTransactionLogOutputFileWrite returns an output writer that prints the transaction log to a text file.
 func TextTransactionLogOutputFileWrite() TransactionLogOutputWriter {
 	return func(transactionId string, startTimestamp time.Time, endTimestamp time.Time, transactionLoggerData *TransactionLoggerData) error {
 		fileName := fmt.Sprintf(filepath.Join(config.LoggerConfig.Logger.OutputDir, "%s_transactions.json"), time.Now().Format(fileTimestampFormat))

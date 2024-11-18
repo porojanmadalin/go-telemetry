@@ -1,7 +1,7 @@
 package logging
 
+// Logger levels used by logger driver.
 const (
-	// Logger levels
 	LevelOff     loggerLevel = "off"     // 0
 	LevelInfo    loggerLevel = "info"    // 1
 	LevelWarning loggerLevel = "warning" // 2
@@ -9,8 +9,8 @@ const (
 	LevelDebug   loggerLevel = "debug"   // 4
 )
 
+// Logger levels numbers used when comparing string log levels
 const (
-	// Logger levels
 	levelOffInt     int = 0
 	levelInfoInt    int = 1
 	levelWarningInt int = 2
@@ -18,6 +18,7 @@ const (
 	levelDebugInt   int = 4
 )
 
+// Output writers types that resemble the way the logs are printed
 const (
 	cli      OutputWriterType = "cli"
 	jsonFile OutputWriterType = "jsonFile"
@@ -40,8 +41,10 @@ const (
 
 type loggerLevel string
 
+// A OutputWriterType is a output writer driver identifier.
 type OutputWriterType string
 
+// convertLoggerLevelToInt converts loggerLevel type to its corresponding number value
 func convertLoggerLevelToInt(loggerLevel loggerLevel) int {
 	switch loggerLevel {
 	case LevelOff:

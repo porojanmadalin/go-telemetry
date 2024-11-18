@@ -12,8 +12,10 @@ import (
 	"time"
 )
 
+// A LogOutputWriter is a output writer function for standard logging.
 type LogOutputWriter func(*LoggerData) error
 
+// CLILogOutputWrite returns an output writer that prints the logs to the CLI.
 func CLILogOutputWrite() LogOutputWriter {
 	return func(loggerData *LoggerData) error {
 		fmt.Printf("[%s] [%s] %s", loggerData.Timestamp.Format(timestampFormat), loggerData.LoggerLevel, loggerData.Message)
@@ -35,6 +37,7 @@ func CLILogOutputWrite() LogOutputWriter {
 	}
 }
 
+// JSONLogOutputFileWrite returns an output writer that prints the logs to a JSON file.
 func JSONLogOutputFileWrite() LogOutputWriter {
 	return func(loggerData *LoggerData) error {
 		fileName := fmt.Sprintf(filepath.Join(config.LoggerConfig.Logger.OutputDir, "%s.json"), time.Now().Format(fileTimestampFormat))
@@ -78,6 +81,7 @@ func JSONLogOutputFileWrite() LogOutputWriter {
 	}
 }
 
+// TextLogOutputFileWrite returns an output writer that prints the logs to a text file.
 func TextLogOutputFileWrite() LogOutputWriter {
 	return func(loggerData *LoggerData) error {
 		fileName := fmt.Sprintf(filepath.Join(config.LoggerConfig.Logger.OutputDir, "%s.log"), time.Now().Format(fileTimestampFormat))
