@@ -107,7 +107,7 @@ func TestNewLogWithYAMLConfig(t *testing.T) {
 		assert.Equal(t, test.Expected.Level, log.loggerLevel)
 		fnName, err := itesting.GetFunctionName(log.outputWrite)
 		if err != nil {
-			t.FailNow()
+			t.Fatalf("fatal: could not locate the function %v", err)
 		}
 		assert.Contains(t, fnName, test.Expected.OutputWriterName)
 	}
@@ -125,7 +125,7 @@ func TestWithLogOutputWriter(t *testing.T) {
 	WithLogOutputWriter(CLI)(&l)
 	fnName, err := itesting.GetFunctionName(l.outputWrite)
 	if err != nil {
-		t.FailNow()
+		t.Fatalf("fatal: could not locate the function %v", err)
 	}
 	assert.Contains(t, fnName, CLILogOutputWriteName)
 }

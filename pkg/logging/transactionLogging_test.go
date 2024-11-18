@@ -116,7 +116,7 @@ func TestNewTransactionLogWithYAMLConfig(t *testing.T) {
 		assert.Equal(t, test.Expected.Level, log.loggerLevel)
 		fnName, err := itesting.GetFunctionName(log.outputWrite)
 		if err != nil {
-			t.FailNow()
+			t.Fatalf("fatal: could not locate the function %v", err)
 		}
 		assert.Contains(t, fnName, test.Expected.OutputWriterName)
 	}
@@ -134,7 +134,7 @@ func TestWithTransactionLogOutputWriter(t *testing.T) {
 	WithTransactionLogOutputWriter(CLI)(&l)
 	fnName, err := itesting.GetFunctionName(l.outputWrite)
 	if err != nil {
-		t.FailNow()
+		t.Fatalf("fatal: could not locate the function %v", err)
 	}
 	assert.Contains(t, fnName, CLITransactionLogOutputWriteName)
 }
