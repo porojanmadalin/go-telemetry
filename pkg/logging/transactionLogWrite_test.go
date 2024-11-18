@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"go-telemetry/pkg/internal/config"
 	itesting "go-telemetry/pkg/internal/telemetrytesting"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -120,47 +121,43 @@ func TestJSONTransactionLogOutputFileWrite(t *testing.T) {
 	}
 }
 
-// func TestTextTransactionLogOutputFileWrite(t *testing.T) {
-// 	setupTestEnvironment(t, transactionLogTestDirName)
+func TestTextTransactionLogOutputFileWrite(t *testing.T) {
+	setupTestEnvironment(t, transactionLogTestDirName)
 
-// 	now := time.Now()
-// 	generatedFileName := fmt.Sprintf("%s.log", now.Format(fileTimestampFormat))
-// 	t.Cleanup(func() {
-// 		cleanup(t, []string{generatedFileName})
-// 	})
+	now := time.Now()
+	generatedFileName := fmt.Sprintf("%s.log", now.Format(fileTimestampFormat))
+	t.Cleanup(func() {
+		cleanup(t, []string{generatedFileName})
+	})
 
-// 	testLogging := LoggerData{
-// 		LoggerLevel: LevelInfo,
-// 		Timestamp:   now,
-// 		Message:     "test",
-// 		MetaData: map[string]any{
-// 			"varInt":   0,
-// 			"varStr":   "string",
-// 			"varFloat": 3.14,
-// 		},
-// 	}
+	err := TextTransactionLogOutputFileWrite()(testTransactionId, now, testEndTimestamp, &testTransactionLogging)
+	if err != nil {
+		t.Fatalf("fatal: could not write logs to text file %v", err)
+	}
 
-// 	err := TextLogOutputFileWrite()(&testLogging)
-// 	if err != nil {
-// 		t.Fatalf("fatal: could not write logs to text file %v", err)
-// 	}
+	f, err := os.OpenFile(filepath.Join(config.LoggerConfig.Logger.OutputDir, generatedFileName), os.O_RDONLY, 0644)
+	if err != nil {
+		t.Fatalf("error: could not open text file %v", err)
+	}
+	defer f.Close()
 
-// 	f, err := os.OpenFile(filepath.Join(config.LoggerConfig.Logger.OutputDir, generatedFileName), os.O_RDONLY, 0644)
-// 	if err != nil {
-// 		t.Fatalf("error: could not open text file %v", err)
-// 	}
-// 	defer f.Close()
+	b, err := io.ReadAll(f)
+	if err != nil {
+		t.Fatalf("error: could not read from text file %v", err)
+	}
 
-// 	b, err := io.ReadAll(f)
-// 	if err != nil {
-// 		t.Fatalf("error: could not read from text file %v", err)
-// 	}
+	outputStr := string(b[:])
 
-// 	output := string(b[:])
+	outputLines := strings.Split(outputStr, "\n")
 
-// 	assert.Contains(t, output, logFormat(testLogging))
-// 	assert.Contains(t, output, "varInt=0")
-// 	assert.Contains(t, output, "varStr=string")
-// 	assert.Contains(t, output, "varFloat=3.14")
-// 	assert.Contains(t, output, "\n")
-// }
+	assert.True(t, len(testTransactionLogging.TransactionLogs) == len(outputLines)-3)
+	assert.Equal(t, transactionLogFormatStart(testTransactionId, now), outputLines[0])
+	assert.Equal(t, transactionLogFormatEnd(testTransactionId, testEndTimestamp), outputLines[len(outputLines)-2])
+
+	for i := 1; i <= len(outputLines)-3; i++ {
+		assert.Contains(t, outputLines[i], "--> "+logFormat(*testTransactionLogging.TransactionLogs[i-1]))
+		assert.Contains(t, outputLines[i], fmt.Sprintf("varInt=%d", testTransactionLogging.TransactionLogs[i-1].MetaData["varInt"]))
+		assert.Contains(t, outputLines[i], fmt.Sprintf("varStr=%s", testTransactionLogging.TransactionLogs[i-1].MetaData["varStr"]))
+		assert.Contains(t, outputLines[i], fmt.Sprintf("varFloat=%f", testTransactionLogging.TransactionLogs[i-1].MetaData["varFloat"]))
+	}
+}
