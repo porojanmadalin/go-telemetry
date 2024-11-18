@@ -8,14 +8,14 @@ import (
 	"testing"
 )
 
-func setupTestEnvironment(t *testing.T) {
+func setupTestEnvironment(t *testing.T, testDirName string) {
 	config.LoggerConfig = &config.Config{}
 	_, file, _, ok := runtime.Caller(0)
 	if !ok {
 		t.Fatal("fatal: unable to identify current directory")
 	}
 
-	outputPath := filepath.Join(filepath.Dir(file), "../../test/")
+	outputPath := filepath.Join(filepath.Dir(file), "../../test/"+testDirName)
 
 	err := os.MkdirAll(outputPath, os.ModePerm)
 	if err != nil {

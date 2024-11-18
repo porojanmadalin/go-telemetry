@@ -3,10 +3,13 @@ package abcd
 import (
 	"fmt"
 	"io"
+	"math"
 	"os"
 	"reflect"
 	"runtime"
 )
+
+const float64EqualityThreshold = 1e-9
 
 func CaptureOutput(f func() error) (string, error) {
 	orig := os.Stdout
@@ -26,4 +29,8 @@ func GetFunctionName(function interface{}) (string, error) {
 		return fn.Name(), nil
 	}
 	return "", fmt.Errorf("error: could not get the function name")
+}
+
+func AlmostEqual(a, b float64) bool {
+	return math.Abs(a-b) <= float64EqualityThreshold
 }
