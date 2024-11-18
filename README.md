@@ -14,6 +14,7 @@ GO_TELEMETRY_FILE_PATH=<DEFAULT:telemetry-config.yml> # The file name of the tel
 logger:
   level: <off|info|warning|debug|error> # Default: info
   outputWriter: <cli|jsonFile|textFile> # Default: cli
+  outputDir: .                          # Default: root dir
 ```
 
 ## Test

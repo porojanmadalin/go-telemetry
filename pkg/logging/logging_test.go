@@ -167,8 +167,7 @@ func TestInfo(t *testing.T) {
 		return nil
 	})
 	if err != nil {
-		t.Errorf("error: could not capture stdout output %v", err)
-		return
+		t.Fatalf("error: could not capture stdout output %v", err)
 	}
 
 	assert.Contains(t, bytes, "varInt=0")
@@ -196,8 +195,7 @@ func TestWarning(t *testing.T) {
 		return nil
 	})
 	if err != nil {
-		t.Errorf("error: could not capture stdout output %v", err)
-		return
+		t.Fatalf("error: could not capture stdout output %v", err)
 	}
 
 	assert.Contains(t, bytes, "varInt=0")
@@ -225,8 +223,7 @@ func TestError(t *testing.T) {
 		return nil
 	})
 	if err != nil {
-		t.Errorf("error: could not capture stdout output %v", err)
-		return
+		t.Fatalf("error: could not capture stdout output %v", err)
 	}
 
 	assert.Contains(t, bytes, "varInt=0")
@@ -254,8 +251,7 @@ func TestDebug(t *testing.T) {
 		return nil
 	})
 	if err != nil {
-		t.Errorf("error: could not capture stdout output %v", err)
-		return
+		t.Fatalf("error: could not capture stdout output %v", err)
 	}
 
 	assert.Contains(t, bytes, "varInt=0")

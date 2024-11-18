@@ -22,8 +22,8 @@ func setupConfigFile(t *testing.T, logLevel string, outputWriter string) error {
 		t.Fatalf("fatal: could not create test directory %v", err)
 	}
 
-	os.Setenv(configFileNameEnvKey, filepath.Join(filepath.Dir(file), "../../../test/"+defaultConfigFileName))
-	configFilePath := os.Getenv(configFileNameEnvKey)
+	os.Setenv(configFilePathEnvKey, filepath.Join(filepath.Dir(file), "../../../test/"+defaultConfigFileName))
+	configFilePath := os.Getenv(configFilePathEnvKey)
 	f, err := os.OpenFile(configFilePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
 		t.Fatalf("fatal: could not open yml file %v", err)
@@ -49,7 +49,7 @@ func setupConfigFile(t *testing.T, logLevel string, outputWriter string) error {
 }
 
 func cleanup(t *testing.T) {
-	err := os.Remove(os.Getenv(configFileNameEnvKey))
+	err := os.Remove(os.Getenv(configFilePathEnvKey))
 	if err != nil {
 		t.Fatalf("fatal: could not delete the testing config file %v", err)
 	}

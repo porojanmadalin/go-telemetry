@@ -9,13 +9,15 @@ import (
 )
 
 const (
-	configFileNameEnvKey  = "GO_TELEMETRY_FILE_PATH"
+	configFilePathEnvKey = "GO_TELEMETRY_FILE_PATH"
+
 	defaultConfigFileName = "telemetry-config.yml"
 )
 
 type Logger struct {
 	Level        string `yaml:"level"`
 	OutputWriter string `yaml:"outputWriter"`
+	OutputDir    string `yaml:"outputDir"`
 }
 
 type Config struct {
@@ -36,7 +38,7 @@ func Init() *Config {
 }
 
 func loadConfig() *Config {
-	configFileName := os.Getenv(configFileNameEnvKey)
+	configFileName := os.Getenv(configFilePathEnvKey)
 	if configFileName == "" {
 		configFileName = defaultConfigFileName
 	}
