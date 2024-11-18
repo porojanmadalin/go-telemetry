@@ -43,7 +43,7 @@ func CLITransactionLogOutputWrite() TransactionLogOutputWriter {
 
 func JSONTransactionLogOutputFileWrite() TransactionLogOutputWriter {
 	return func(transactionId string, startTimestamp time.Time, endTimestamp time.Time, transactionLoggerData *TransactionLoggerData) error {
-		fileName := fmt.Sprintf(filepath.Join(config.LoggerConfig.Logger.OutputDir, "%s.json"), time.Now().Format(fileTimestampFormat))
+		fileName := fmt.Sprintf(filepath.Join(config.LoggerConfig.Logger.OutputDir, "%s_transactions.json"), time.Now().Format(fileTimestampFormat))
 		f, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE, 0644)
 		if err != nil {
 			return fmt.Errorf("error: could not open json file %v", err)
@@ -99,7 +99,7 @@ func JSONTransactionLogOutputFileWrite() TransactionLogOutputWriter {
 
 func TextTransactionLogOutputFileWrite() TransactionLogOutputWriter {
 	return func(transactionId string, startTimestamp time.Time, endTimestamp time.Time, transactionLoggerData *TransactionLoggerData) error {
-		fileName := fmt.Sprintf(filepath.Join(config.LoggerConfig.Logger.OutputDir, "%s.log"), time.Now().Format(fileTimestampFormat))
+		fileName := fmt.Sprintf(filepath.Join(config.LoggerConfig.Logger.OutputDir, "%s_transactions.json"), time.Now().Format(fileTimestampFormat))
 		f, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 		if err != nil {
 			return fmt.Errorf("error: could not open text file %v", err)

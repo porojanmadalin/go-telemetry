@@ -78,7 +78,7 @@ func TestCLITransactionLogOutputWrite(t *testing.T) {
 func TestJSONTransactionLogOutputFileWrite(t *testing.T) {
 	setupTestEnvironment(t, transactionLogTestDirName)
 
-	generatedFileName := fmt.Sprintf("%s.json", now.Format(fileTimestampFormat))
+	generatedFileName := fmt.Sprintf("%s_transactions.json", now.Format(fileTimestampFormat))
 	t.Cleanup(func() {
 		cleanup(t, []string{generatedFileName})
 	})
@@ -121,7 +121,7 @@ func TestTextTransactionLogOutputFileWrite(t *testing.T) {
 	setupTestEnvironment(t, transactionLogTestDirName)
 
 	now := time.Now()
-	generatedFileName := fmt.Sprintf("%s.log", now.Format(fileTimestampFormat))
+	generatedFileName := fmt.Sprintf("%s_transactions.json", now.Format(fileTimestampFormat))
 	t.Cleanup(func() {
 		cleanup(t, []string{generatedFileName})
 	})
