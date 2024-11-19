@@ -6,6 +6,8 @@ The library implements a minimal logging tool and a transaction logging tool.
 
 The Transaction logging tool groups individual logs to form a transaction. (e.g. Wishlist Feature: Add items to cart -> log -> Browse Similar Items -> log -> Remove an item from cart -> log...)
 
+_The library is also thread safe_.
+
 ## Getting started
 
 To use this lib:
@@ -20,7 +22,11 @@ The instances can be configured using multiple drivers:
 e.g.
 
 ```go
-logging.NewLog(logging.WithLogLevel(logging.LevelDebug), logging.WithLogOutputWriter(logging.JSONLogOutputFileWrite))
+import "go-telemetry/pkg/logging"
+
+func main() {
+  log, err := logging.NewLog(logging.WithLogLevel(logging.LevelDebug), logging.WithLogOutputWriter(logging.JSONLogOutputFileWrite))
+}
 ```
 
 - `logging.WithTransactionLogLevel`, `logging.WithTransactionOutputWriter` for transaction logging
@@ -28,10 +34,18 @@ logging.NewLog(logging.WithLogLevel(logging.LevelDebug), logging.WithLogOutputWr
 e.g.
 
 ```go
-logging.NewTransactionLog(logging.WithTransactionLogLevel(logging.LevelDebug), logging.WithTransacrionLogOutputWriter(logging.JSONLogOutputFileWrite))
+import "go-telemetry/pkg/logging"
+
+func main() {
+  transactionLog, err := logging.NewTransactionLog(logging.WithTransactionLogLevel(logging.LevelDebug), logging.WithTransacrionLogOutputWriter(logging.JSONLogOutputFileWrite))
+}
 ```
 
 Default configuration is `logging.LevelInfo` with `logging.CLILogOutputWrite` for standard logging and `logging.CLITransactionLogOutputWrite` for transaction logging. This configuration can be overwritten using a [YAML Configuration file](#yaml-configuration-file).
+
+To capture transaction logs, first start the transaction using the log instance, `transactionLog.StartTransactionLogging()` and then log Info/Warning/Error/Debug.
+
+To finish the transaction, call `transactionLog.StopTransactionLogging()`. The transaction will be printed to the desired output (default cli).
 
 ## Environment Variables
 
@@ -58,13 +72,13 @@ logger:
 
 ## Test
 
-Unit test coverage of 86.3%.
+Unit test coverage of **86.3%**.
 
 `go test -v ./... [--cover]`
 
 ## Library API
 
-```
+```go
 CONSTANTS
 
 const (
