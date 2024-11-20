@@ -12,13 +12,15 @@ _The library is also thread safe_.
 
 To use this lib:
 
+![Fig. 1: Standard Logging](./docs/log-instance-creation-behavioral_diagram.png)
+
 - Use `logging.NewLog` to instantiate a standard log tool.
 
-![Fig. 1: Standard Logging](./docs/logging-behavioral_diagram.png)
+![Fig. 2: Standard Logging](./docs/logging-behavioral_diagram.png)
 
 - Use `logging.NewTransactionLog` to instantiate a transaction based log tool, that groups standard logs in a transactional group.
 
-![Fig. 2: Transaction Logging](./docs/transaction_logging-behavioral_diagram.png)
+![Fig. 3: Transaction Logging](./docs/transaction_logging-behavioral_diagram.png)
 
 The instances can be configured using multiple drivers:
 
@@ -85,11 +87,11 @@ Unit test coverage of **86.3%**.
 
 ### Standard Logging
 
-![Fig. 3: Standard Logging](./docs/log-sequence_diagram.png)
+![Fig. 4: Standard Logging](./docs/log-sequence_diagram.png)
 
 ### Transaction Logging
 
-![Fig. 4: Transaction Logging](./docs/transaction_log-sequence_diagram.png)
+![Fig. 5: Transaction Logging](./docs/transaction_log-sequence_diagram.png)
 
 ## Library API
 
